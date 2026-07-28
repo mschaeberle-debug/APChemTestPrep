@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Foundations Review — Stoichiometry &amp; Gas Laws</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #16241f;
+    --bg-alt: #1d2f28;
+    --card: #1b2b25;
+    --ink: #f1ede4;
+    --ink-dim: #a9b6ae;
+    --accent: #e8a93e;
+    --accent-dim: #8a6a2e;
+    --correct: #7fa687;
+    --correct-bg: rgba(127,166,135,0.14);
+    --incorrect: #c1554b;
+    --incorrect-bg: rgba(193,85,75,0.14);
+    --rule: rgba(241,237,228,0.16);
+    --grid: rgba(241,237,228,0.045);
+  }
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    background-color:var(--bg);
+    background-image:
+      repeating-linear-gradient(0deg, var(--grid) 0px, var(--grid) 1px, transparent 1px, transparent 28px),
+      repeating-linear-gradient(90deg, var(--grid) 0px, var(--grid) 1px, transparent 1px, transparent 28px);
+    color:var(--ink);
+    font-family:'Source Serif 4', Georgia, serif;
+    line-height:1.5;
+    min-height:100vh;
+  }
+  .mono{ font-family:'Space Mono', monospace; }
+  a{ color:inherit; }
+
+  /* ---------- Header ---------- */
+  header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:24px;
+    padding:32px clamp(16px,4vw,48px) 20px;
+    border-bottom:1px solid var(--rule);
+    flex-wrap:wrap;
+  }
+  .title-block .eyebrow{
+    font-family:'Space Mono', monospace;
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin:0 0 6px;
+  }
+  .title-block h1{
+    margin:0;
+    font-size:clamp(24px,3.4vw,34px);
+    font-weight:700;
+    letter-spacing:-0.01em;
+  }
+  .title-block p{
+    margin:6px 0 0;
+    color:var(--ink-dim);
+    font-size:15px;
+  }
+
+  /* ---------- Gauge (signature element) ---------- */
+  .gauge-wrap{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:2px;
+    min-width:150px;
+  }
+  .gauge-wrap svg{ width:150px; height:90px; overflow:visible; }
+  .gauge-readout{
+    font-family:'Space Mono', monospace;
+    font-size:13px;
+    color:var(--ink-dim);
+    letter-spacing:.04em;
+  }
+  .gauge-readout strong{ color:var(--ink); }
+  #needle{ transform-origin:75px 78px; transition: transform .5s cubic-bezier(.3,1.4,.4,1); }
+
+  /* ---------- Topic nav ---------- */
+  nav{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    padding:20px clamp(16px,4vw,48px);
+    position:sticky;
+    top:0;
+    background:linear-gradient(var(--bg) 85%, transparent);
+    z-index:10;
+  }
+  nav button{
+    font-family:'Space Mono', monospace;
+    font-size:12px;
+    letter-spacing:.03em;
+    color:var(--ink-dim);
+    background:transparent;
+    border:1px solid var(--rule);
+    border-radius:100px;
+    padding:8px 16px;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  nav button:hover{ border-color:var(--accent-dim); color:var(--ink); }
+  nav button.active{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#1b2b25;
+    font-weight:700;
+  }
+  nav button:focus-visible, button:focus-visible, .choice:focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:2px;
+  }
+
+  main{ padding:8px clamp(16px,4vw,48px) 80px; max-width:820px; margin:0 auto; }
+  .topic-section{ display:none; }
+  .topic-section.active{ display:block; animation:fade .25s ease; }
+  @keyframes fade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+
+  .topic-heading{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    margin:28px 0 18px;
+  }
+  .topic-heading .num{
+    font-family:'Space Mono', monospace;
+    color:var(--accent);
+    font-size:13px;
+  }
+  .topic-heading h2{ margin:0; font-size:20px; font-weight:700; }
+
+  /* ---------- Question cards ---------- */
+  .card{
+    background:var(--card);
+    border:1px solid var(--rule);
+    border-left:3px solid var(--accent-dim);
+    border-radius:4px;
+    padding:22px 24px;
+    margin-bottom:18px;
+    position:relative;
+  }
+  .card.correct{ border-left-color:var(--correct); }
+  .card.incorrect{ border-left-color:var(--incorrect); }
+  .tag{
+    position:absolute;
+    top:-10px;
+    left:20px;
+    background:var(--bg);
+    border:1px solid var(--rule);
+    font-family:'Space Mono', monospace;
+    font-size:11px;
+    letter-spacing:.06em;
+    color:var(--ink-dim);
+    padding:2px 8px;
+    border-radius:3px;
+  }
+  .card.challenge .tag{ color:var(--accent); border-color:var(--accent-dim); }
+  .q-text{ margin:6px 0 16px; font-size:16.5px; }
+  .q-text sub{ font-size:.7em; }
+
+  .choices{ display:flex; flex-direction:column; gap:8px; }
+  .choice{
+    text-align:left;
+    font-family:'Source Serif 4', serif;
+    font-size:15px;
+    background:transparent;
+    border:1px solid var(--rule);
+    border-radius:4px;
+    padding:10px 14px;
+    color:var(--ink);
+    cursor:pointer;
+    transition:all .12s ease;
+  }
+  .choice:hover:not(:disabled){ border-color:var(--accent); background:rgba(232,169,62,0.06); }
+  .choice:disabled{ cursor:default; }
+  .choice.is-correct{ border-color:var(--correct); background:var(--correct-bg); }
+  .choice.is-incorrect{ border-color:var(--incorrect); background:var(--incorrect-bg); }
+
+  .feedback{
+    margin-top:14px;
+    padding:12px 14px;
+    border-radius:4px;
+    font-size:14.5px;
+    display:none;
+  }
+  .feedback.show{ display:block; }
+  .feedback.good{ background:var(--correct-bg); border:1px solid var(--correct); }
+  .feedback.bad{ background:var(--incorrect-bg); border:1px solid var(--incorrect); }
+  .feedback .label{ font-family:'Space Mono', monospace; font-size:11px; letter-spacing:.06em; text-transform:uppercase; display:block; margin-bottom:4px; }
+  .feedback.good .label{ color:var(--correct); }
+  .feedback.bad .label{ color:var(--incorrect); }
+
+  .reveal-btn{
+    font-family:'Space Mono', monospace;
+    font-size:12.5px;
+    letter-spacing:.03em;
+    background:transparent;
+    border:1px solid var(--accent-dim);
+    color:var(--accent);
+    border-radius:4px;
+    padding:9px 16px;
+    cursor:pointer;
+  }
+  .reveal-btn:hover{ background:rgba(232,169,62,0.1); }
+  .solution{
+    display:none;
+    margin-top:16px;
+    padding:16px 18px;
+    background:rgba(232,169,62,0.06);
+    border:1px dashed var(--accent-dim);
+    border-radius:4px;
+    font-size:14.5px;
+  }
+  .solution.show{ display:block; }
+  .solution ol{ margin:6px 0 0; padding-left:20px; }
+  .solution li{ margin-bottom:6px; }
+  .solution .final{ font-family:'Space Mono', monospace; color:var(--accent); }
+
+  footer{
+    text-align:center;
+    padding:24px;
+    color:var(--ink-dim);
+    font-family:'Space Mono', monospace;
+    font-size:12px;
+    border-top:1px solid var(--rule);
+  }
+  footer button{
+    background:none; border:none; color:var(--ink-dim); text-decoration:underline;
+    cursor:pointer; font-family:'Space Mono', monospace; font-size:12px;
+  }
+  footer button:hover{ color:var(--accent); }
+
+  @media (max-width:560px){
+    header{ flex-direction:column; align-items:flex-start; }
+    .gauge-wrap{ align-self:center; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title-block">
+    <p class="eyebrow">AP Chemistry &middot; Test Review</p>
+    <h1>Foundations: Stoichiometry &amp; Gas Laws</h1>
+    <p>36 problems across 6 topics &mdash; 4 multiple-choice and 2 free-response per topic. Work each one on paper before checking &mdash; the gauge tracks live accuracy on the multiple-choice items.</p>
+  </div>
+  <div class="gauge-wrap">
+    <svg viewBox="0 0 150 90">
+      <path d="M 15 78 A 60 60 0 0 1 135 78" fill="none" stroke="rgba(241,237,228,0.14)" stroke-width="10" stroke-linecap="round"/>
+      <path id="gauge-fill" d="M 15 78 A 60 60 0 0 1 135 78" fill="none" stroke="var(--accent)" stroke-width="10" stroke-linecap="round" stroke-dasharray="188.5" stroke-dashoffset="188.5"/>
+      <g id="needle">
+        <line x1="75" y1="78" x2="75" y2="26" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="75" cy="78" r="5" fill="var(--ink)"/>
+      </g>
+    </svg>
+    <div class="gauge-readout"><strong id="score-num">0</strong> / <span id="score-total">18</span> correct</div>
+  </div>
+</header>
+
+<nav id="topic-nav"></nav>
+<main id="main"></main>
+
+<footer>
+  <button id="reset-btn">reset all progress</button>
+</footer>
+
+<script>
+const TOPICS = [
+  { id:'moles', label:'Mole Conversions', prefix:'M', questions:[
+    { type:'mcq',
+      q:'How many atoms of oxygen are in 2.5 mol of Al<sub>2</sub>(SO<sub>4</sub>)<sub>3</sub>?',
+      choices:['1.51 &times; 10<sup>24</sup>','4.52 &times; 10<sup>24</sup>','6.02 &times; 10<sup>24</sup>','1.81 &times; 10<sup>25</sup>'],
+      correct:3,
+      explanation:'Each formula unit has 3 sulfate groups &times; 4 O = 12 O atoms. 2.5 mol &times; 12 = 30 mol O atoms; 30 &times; 6.022&times;10<sup>23</sup> = 1.81&times;10<sup>25</sup> atoms. The other options come from forgetting to multiply by 12, or by only 3 or 4.'
+    },
+    { type:'mcq',
+      q:'A sample of glucose (C<sub>6</sub>H<sub>12</sub>O<sub>6</sub>, molar mass 180.16 g/mol) contains 3.011 &times; 10<sup>23</sup> molecules. What is the mass of the sample?',
+      choices:['30.0 g','45.0 g','90.1 g','180 g'],
+      correct:2,
+      explanation:'3.011&times;10<sup>23</sup> molecules &divide; 6.022&times;10<sup>23</sup> = 0.500 mol. Mass = 0.500 mol &times; 180.16 g/mol = 90.1 g.'
+    },
+    { type:'mcq',
+      q:'Which 10.0 g sample contains the greatest number of molecules?',
+      choices:['10.0 g H<sub>2</sub>O','10.0 g CO<sub>2</sub>','10.0 g NH<sub>3</sub>','10.0 g CH<sub>4</sub>'],
+      correct:3,
+      explanation:'Moles = mass &divide; molar mass, so the lowest molar mass wins for equal mass. CH<sub>4</sub> (16.04 g/mol) gives 0.623 mol, more than H<sub>2</sub>O (0.555), NH<sub>3</sub> (0.587), or CO<sub>2</sub> (0.227).'
+    },
+    { type:'mcq',
+      q:'A sample contains 2.35 mol of Fe<sub>2</sub>O<sub>3</sub>. How many total ions (Fe<sup>3+</sup> and O<sup>2&minus;</sup> combined) are present?',
+      choices:['1.42 &times; 10<sup>24</sup>','2.83 &times; 10<sup>24</sup>','4.25 &times; 10<sup>24</sup>','7.08 &times; 10<sup>24</sup>'],
+      correct:3,
+      explanation:'Each formula unit of Fe<sub>2</sub>O<sub>3</sub> contains 2 Fe<sup>3+</sup> + 3 O<sup>2&minus;</sup> = 5 ions. mol ions = 2.35 &times; 5 = 11.75 mol; atoms = 11.75 &times; 6.022&times;10<sup>23</sup> = 7.08&times;10<sup>24</sup>. The other options count only the Fe ions, only the O ions, or forget the ion count per formula unit entirely.'
+    },
+    { type:'challenge',
+      q:'A hydrate CuSO<sub>4</sub>&middot;xH<sub>2</sub>O has a mass of 12.50 g. After heating to drive off all the water, the anhydrous CuSO<sub>4</sub> has a mass of 7.99 g. Determine x.',
+      solution:`<ol>
+        <li>Mass of water lost = 12.50 g &minus; 7.99 g = 4.51 g</li>
+        <li>Moles of H<sub>2</sub>O = 4.51 g &divide; 18.02 g/mol = 0.2503 mol</li>
+        <li>Moles of CuSO<sub>4</sub> = 7.99 g &divide; 159.61 g/mol = 0.0501 mol</li>
+        <li>Ratio = 0.2503 &divide; 0.0501 &asymp; 5.00</li>
+      </ol>
+      <p class="final">x = 5 &nbsp;(the hydrate is CuSO<sub>4</sub>&middot;5H<sub>2</sub>O, blue vitriol)</p>`
+    },
+    { type:'challenge',
+      q:'A metal chloride with formula MCl<sub>2</sub> has a mass of 2.38 g and contains 0.0350 mol of Cl<sup>&minus;</sup> ions. Identify the metal M.',
+      solution:`<ol>
+        <li>Each formula unit has 2 Cl<sup>&minus;</sup>, so mol MCl<sub>2</sub> = 0.0350 &divide; 2 = 0.0175 mol</li>
+        <li>Molar mass of MCl<sub>2</sub> = 2.38 g &divide; 0.0175 mol = 136.0 g/mol</li>
+        <li>Mass contributed by Cl<sub>2</sub> = 2 &times; 35.45 = 70.90 g/mol</li>
+        <li>Molar mass of M = 136.0 &minus; 70.90 = 65.1 g/mol</li>
+      </ol>
+      <p class="final">M &asymp; 65.1 g/mol &rarr; zinc (65.38 g/mol); the compound is ZnCl<sub>2</sub></p>`
+    }
+  ]},
+  { id:'formula', label:'Empirical & Molecular Formula', prefix:'F', questions:[
+    { type:'mcq',
+      q:'What is the percent nitrogen by mass in NH<sub>4</sub>NO<sub>3</sub> (molar mass 80.04 g/mol)?',
+      choices:['17.5%','35.0%','46.7%','60.0%'],
+      correct:1,
+      explanation:'Two N atoms: 2 &times; 14.01 = 28.02 g per mole. %N = 28.02 / 80.04 &times; 100 = 35.0%. 17.5% comes from counting only one N; 60.0% is the percent oxygen, mislabeled.'
+    },
+    { type:'mcq',
+      q:'A compound is 40.0% C, 6.7% H, and 53.3% O by mass. What is its empirical formula?',
+      choices:['CHO','CH<sub>2</sub>O','C<sub>2</sub>H<sub>4</sub>O<sub>2</sub>','C<sub>3</sub>H<sub>6</sub>O<sub>3</sub>'],
+      correct:1,
+      explanation:'Per 100 g: C = 40.0/12.01 = 3.33 mol, H = 6.7/1.008 = 6.65 mol, O = 53.3/16.00 = 3.33 mol. Dividing by the smallest (3.33) gives C:H:O = 1:2:1, so CH<sub>2</sub>O. The other choices are multiples or mis-divisions of the correct ratio.'
+    },
+    { type:'mcq',
+      q:'A compound has empirical formula CH<sub>2</sub>O (empirical mass 30.03 g/mol) and an experimentally determined molar mass of 180.16 g/mol. What is the molecular formula?',
+      choices:['C<sub>3</sub>H<sub>6</sub>O<sub>3</sub>','C<sub>6</sub>H<sub>6</sub>O<sub>6</sub>','C<sub>6</sub>H<sub>12</sub>O<sub>6</sub>','C<sub>12</sub>H<sub>24</sub>O<sub>12</sub>'],
+      correct:2,
+      explanation:'180.16 &divide; 30.03 &asymp; 6, so multiply every subscript in CH<sub>2</sub>O by 6: C<sub>6</sub>H<sub>12</sub>O<sub>6</sub> (glucose).'
+    },
+    { type:'mcq',
+      q:'A 3.25 g sample containing only C, H, and O is combusted, producing 4.95 g CO<sub>2</sub> and 2.03 g H<sub>2</sub>O. What is the percent oxygen by mass in the original compound?',
+      choices:['6.99%','41.6%','51.4%','58.4%'],
+      correct:2,
+      explanation:'mol CO<sub>2</sub> = 4.95/44.01 = 0.1125 mol &rarr; mass C = 1.351 g (41.6%). mol H<sub>2</sub>O = 2.03/18.02 = 0.1127 mol &rarr; mol H = 0.2253, mass H = 0.227 g (6.99%). Mass O = 3.25 &minus; 1.351 &minus; 0.227 = 1.672 g, so %O = 1.672/3.25 &times; 100 = 51.4%. The other options are the %C, %H, or a subtraction error.'
+    },
+    { type:'challenge',
+      q:'Combustion of a 0.500 g sample of a hydrocarbon (C and H only) produces 1.466 g CO<sub>2</sub> and 0.900 g H<sub>2</sub>O. Determine the empirical formula.',
+      solution:`<ol>
+        <li>mol CO<sub>2</sub> = 1.466 / 44.01 = 0.03332 mol &rarr; mol C = 0.03332</li>
+        <li>mol H<sub>2</sub>O = 0.900 / 18.02 = 0.04995 mol &rarr; mol H = 2 &times; 0.04995 = 0.09990</li>
+        <li>Check mass: (0.03332 &times; 12.01) + (0.09990 &times; 1.008) = 0.400 + 0.101 = 0.501 g &asymp; 0.500 g, confirming no oxygen in the original sample</li>
+        <li>Ratio C:H = 0.03332 : 0.09990 &asymp; 1 : 3</li>
+      </ol>
+      <p class="final">Empirical formula = CH<sub>3</sub> &nbsp;(consistent with a compound like C<sub>2</sub>H<sub>6</sub>)</p>`
+    },
+    { type:'challenge',
+      q:'A compound contains only C, H, N, and O. Combustion of a 1.500 g sample yields 1.759 g CO<sub>2</sub> and 0.900 g H<sub>2</sub>O. Separate analysis shows the compound is 18.66% N by mass, with the remainder oxygen. The molar mass is 75.07 g/mol. Find the molecular formula.',
+      solution:`<ol>
+        <li>mol CO<sub>2</sub> = 1.759/44.01 = 0.03997 mol &rarr; mass C = 0.480 g &rarr; %C = 32.0%</li>
+        <li>mol H<sub>2</sub>O = 0.900/18.02 = 0.04994 mol &rarr; mol H = 0.09988, mass H = 0.1007 g &rarr; %H = 6.71%</li>
+        <li>%O = 100 &minus; 32.0 &minus; 6.71 &minus; 18.66 = 42.63%</li>
+        <li>Per 100 g: C = 32.0/12.01 = 2.665 mol, H = 6.71/1.008 = 6.657 mol, N = 18.66/14.01 = 1.332 mol, O = 42.63/16.00 = 2.664 mol</li>
+        <li>Divide by smallest (N = 1.332): C:H:N:O &asymp; 2 : 5 : 1 : 2</li>
+      </ol>
+      <p class="final">Empirical formula C<sub>2</sub>H<sub>5</sub>NO<sub>2</sub> has mass 75.07 g/mol, matching the molar mass exactly &rarr; molecular formula = C<sub>2</sub>H<sub>5</sub>NO<sub>2</sub> (glycine)</p>`
+    }
+  ]},
+  { id:'stoich', label:'Stoichiometry & Yield', prefix:'S', questions:[
+    { type:'mcq',
+      q:'2 Al(s) + 3 CuSO<sub>4</sub>(aq) &rarr; Al<sub>2</sub>(SO<sub>4</sub>)<sub>3</sub>(aq) + 3 Cu(s). If 5.40 g Al reacts with 60.0 g CuSO<sub>4</sub>, which is the limiting reactant?',
+      choices:['Al','CuSO<sub>4</sub>','Both are used up exactly','Cannot be determined'],
+      correct:0,
+      explanation:'mol Al = 5.40/26.98 = 0.2002 mol; mol CuSO<sub>4</sub> = 60.0/159.61 = 0.3759 mol. The 0.3759 mol CuSO<sub>4</sub> would need only (2/3)&times;0.3759 = 0.251 mol Al &mdash; more than the 0.2002 mol available &mdash; so Al runs out first.'
+    },
+    { type:'mcq',
+      q:'Using the same 5.40 g Al with excess CuSO<sub>4</sub>, what mass of Cu is theoretically produced?',
+      choices:['6.36 g','12.7 g','19.1 g','25.4 g'],
+      correct:2,
+      explanation:'mol Al = 0.2002 mol. Mole ratio Al:Cu = 2:3, so mol Cu = 0.2002 &times; 1.5 = 0.3003 mol. Mass = 0.3003 &times; 63.55 g/mol = 19.1 g.'
+    },
+    { type:'mcq',
+      q:'If the actual yield of Cu from the reaction above is 15.3 g, what is the percent yield?',
+      choices:['60.1%','80.2%','100%','124.8%'],
+      correct:1,
+      explanation:'%yield = actual/theoretical &times; 100 = 15.3/19.08 &times; 100 = 80.2%.'
+    },
+    { type:'mcq',
+      q:'2 C<sub>4</sub>H<sub>10</sub>(g) + 13 O<sub>2</sub>(g) &rarr; 8 CO<sub>2</sub>(g) + 10 H<sub>2</sub>O(g). How many moles of CO<sub>2</sub> form from 3.00 mol C<sub>4</sub>H<sub>10</sub> reacting with excess O<sub>2</sub>?',
+      choices:['3.00 mol','6.00 mol','12.0 mol','24.0 mol'],
+      correct:2,
+      explanation:'The mole ratio of C<sub>4</sub>H<sub>10</sub> to CO<sub>2</sub> is 2:8, which simplifies to 1:4. mol CO<sub>2</sub> = 3.00 &times; 4 = 12.0 mol.'
+    },
+    { type:'challenge',
+      q:'N<sub>2</sub>(g) + 3 H<sub>2</sub>(g) &rarr; 2 NH<sub>3</sub>(g). A student reacts 25.0 g N<sub>2</sub> with 8.00 g H<sub>2</sub>. (a) Identify the limiting reactant. (b) Find the theoretical yield of NH<sub>3</sub>. (c) If 24.5 g NH<sub>3</sub> is actually produced, find the percent yield.',
+      solution:`<ol>
+        <li>mol N<sub>2</sub> = 25.0/28.02 = 0.8922 mol; mol H<sub>2</sub> = 8.00/2.016 = 3.968 mol</li>
+        <li>Needed H<sub>2</sub> for all the N<sub>2</sub>: 0.8922 &times; 3 = 2.677 mol &mdash; only 2.677 mol H<sub>2</sub> needed, but 3.968 mol is available, so H<sub>2</sub> is in excess and <strong>N<sub>2</sub> is limiting</strong></li>
+        <li>Theoretical mol NH<sub>3</sub> = 0.8922 &times; 2 = 1.7844 mol &rarr; mass = 1.7844 &times; 17.03 = 30.4 g</li>
+        <li>%yield = 24.5 / 30.4 &times; 100 = 80.6%</li>
+      </ol>
+      <p class="final">Limiting: N<sub>2</sub> &middot; Theoretical yield: 30.4 g &middot; Percent yield: 80.6%</p>`
+    },
+    { type:'challenge',
+      q:'2 KClO<sub>3</sub>(s) &rarr; 2 KCl(s) + 3 O<sub>2</sub>(g). A student heats 15.0 g of KClO<sub>3</sub> (molar mass 122.55 g/mol) until it completely decomposes. (a) Calculate the theoretical yield of O<sub>2</sub> in grams. (b) If 5.40 g of O<sub>2</sub> is collected, calculate the percent yield. (c) Suggest one experimental reason the yield might be below 100%.',
+      solution:`<ol>
+        <li>mol KClO<sub>3</sub> = 15.0/122.55 = 0.1224 mol</li>
+        <li>Mole ratio KClO<sub>3</sub>:O<sub>2</sub> = 2:3, so mol O<sub>2</sub> = 0.1224 &times; 1.5 = 0.1836 mol</li>
+        <li>Theoretical mass O<sub>2</sub> = 0.1836 &times; 32.00 = 5.88 g</li>
+        <li>%yield = 5.40 / 5.88 &times; 100 = 91.8%</li>
+      </ol>
+      <p class="final">Theoretical yield: 5.88 g &middot; Percent yield: 91.8%. (c) Possible reasons: incomplete decomposition of the sample, gas escaping before collection, or some O<sub>2</sub> remaining dissolved/trapped in the solid residue.</p>`
+    }
+  ]},
+  { id:'ideal', label:'Ideal Gas Law', prefix:'I', questions:[
+    { type:'mcq',
+      q:'A 2.00 L container holds 0.500 mol of gas at 27&deg;C. What is the pressure?',
+      choices:['0.500 atm','3.08 atm','6.16 atm','12.3 atm'],
+      correct:2,
+      explanation:'T = 27 + 273.15 = 300.15 K. P = nRT/V = (0.500)(0.08206)(300.15)/2.00 = 6.16 atm.'
+    },
+    { type:'mcq',
+      q:'A gas has a density of 1.964 g/L at STP. What is its molar mass, and which gas is it likely to be?',
+      choices:['28.0 g/mol &mdash; N<sub>2</sub>','32.0 g/mol &mdash; O<sub>2</sub>','44.0 g/mol &mdash; CO<sub>2</sub>','64.0 g/mol &mdash; SO<sub>2</sub>'],
+      correct:2,
+      explanation:'At STP, molar volume = 22.4 L/mol. Molar mass = density &times; 22.4 = 1.964 &times; 22.4 = 44.0 g/mol, matching CO<sub>2</sub>.'
+    },
+    { type:'mcq',
+      q:'A gas sample has a density of 1.25 g/L at 1.00 atm and 300 K. Using M = dRT/P, find the molar mass.',
+      choices:['15.4 g/mol','24.6 g/mol','30.8 g/mol','61.5 g/mol'],
+      correct:2,
+      explanation:'M = dRT/P = (1.25)(0.08206)(300)/1.00 = 30.8 g/mol.'
+    },
+    { type:'mcq',
+      q:'A balloon contains 0.0850 mol of gas at 1.05 atm and occupies 2.10 L. What is the temperature of the gas?',
+      choices:['43.0 K','158 K','316 K','632 K'],
+      correct:2,
+      explanation:'T = PV/nR = (1.05)(2.10) / [(0.0850)(0.08206)] = 2.205/0.006975 = 316 K.'
+    },
+    { type:'challenge',
+      q:'A 0.250 g sample of a volatile liquid is fully vaporized, filling a 102 mL flask at 100.0&deg;C and 745 mmHg (Dumas method). Calculate the molar mass of the unknown.',
+      solution:`<ol>
+        <li>Convert units: P = 745/760 = 0.9803 atm; V = 0.102 L; T = 373.15 K</li>
+        <li>n = PV/RT = (0.9803)(0.102) / [(0.08206)(373.15)] = 0.09999 / 30.62 = 0.003266 mol</li>
+        <li>M = mass / mol = 0.250 g / 0.003266 mol</li>
+      </ol>
+      <p class="final">M &asymp; 76.5 g/mol</p>`
+    },
+    { type:'challenge',
+      q:'A 1.00 L rigid container holds an ideal gas at 2.00 atm and 300 K. It is connected to an evacuated 3.00 L container and the gas is allowed to expand to fill both at constant temperature. (a) Find the new pressure. (b) Does the number of moles of gas change? Explain using kinetic molecular theory.',
+      solution:`<ol>
+        <li>Total volume after connecting = 1.00 + 3.00 = 4.00 L</li>
+        <li>Constant temperature &rarr; Boyle&rsquo;s law: P<sub>1</sub>V<sub>1</sub> = P<sub>2</sub>V<sub>2</sub></li>
+        <li>P<sub>2</sub> = (2.00 &times; 1.00) / 4.00 = 0.500 atm</li>
+      </ol>
+      <p class="final">New pressure: 0.500 atm. (b) The number of moles is unchanged &mdash; no gas was added or removed. The same particles now occupy 4&times; the volume, so they strike the container walls less frequently per unit area, which is why pressure drops even though nothing about the gas itself changed.</p>`
+    }
+  ]},
+  { id:'combined', label:'Combined Gas Law & Dalton&rsquo;s Law', prefix:'D', questions:[
+    { type:'mcq',
+      q:'A gas occupies 4.00 L at 1.00 atm and 300 K. What volume will it occupy at 2.50 atm and 350 K?',
+      choices:['1.87 L','2.33 L','4.67 L','6.86 L'],
+      correct:0,
+      explanation:'P&#8321;V&#8321;/T&#8321; = P&#8322;V&#8322;/T&#8322;. V&#8322; = (1.00)(4.00)(350) / [(300)(2.50)] = 1400/750 = 1.87 L.'
+    },
+    { type:'mcq',
+      q:'A sealed container holds N<sub>2</sub> at 0.60 atm, O<sub>2</sub> at 0.25 atm, and CO<sub>2</sub> at 0.15 atm. What is the mole fraction of O<sub>2</sub>?',
+      choices:['0.15','0.25','0.60','1.00'],
+      correct:1,
+      explanation:'Total pressure = 0.60 + 0.25 + 0.15 = 1.00 atm. Mole fraction O<sub>2</sub> = P(O<sub>2</sub>)/P(total) = 0.25/1.00 = 0.25.'
+    },
+    { type:'mcq',
+      q:'A gas is collected over water at 25&deg;C where total pressure is 758 mmHg. Vapor pressure of water at 25&deg;C is 23.8 mmHg. What is the partial pressure of the dry gas?',
+      choices:['23.8 mmHg','734 mmHg','758 mmHg','781.8 mmHg'],
+      correct:1,
+      explanation:'Dalton&rsquo;s law: P(dry gas) = P(total) &minus; P(water vapor) = 758 &minus; 23.8 = 734 mmHg.'
+    },
+    { type:'mcq',
+      q:'A weather balloon holds 12.0 L of He at 1.00 atm and 20.0&deg;C at ground level. Rising, it experiences 0.340 atm and &minus;40.0&deg;C. What is its new volume?',
+      choices:['9.51 L','15.0 L','28.1 L','40.2 L'],
+      correct:2,
+      explanation:'Combined gas law: V<sub>2</sub> = V<sub>1</sub> &times; (P<sub>1</sub>/P<sub>2</sub>) &times; (T<sub>2</sub>/T<sub>1</sub>) = 12.0 &times; (1.00/0.340) &times; (233.15/293.15) = 12.0 &times; 2.941 &times; 0.7953 = 28.1 L.'
+    },
+    { type:'challenge',
+      q:'A rigid 5.00 L tank holds O<sub>2</sub> and He at 25&deg;C with total pressure 3.00 atm, and contains 0.400 mol He. (a) Find the partial pressure of He. (b) Find mol O<sub>2</sub>. (c) If heated to 75&deg;C at constant volume, find the new total pressure.',
+      solution:`<ol>
+        <li>P(He) = nRT/V = (0.400)(0.08206)(298.15)/5.00 = 9.79/5.00 = 1.96 atm</li>
+        <li>P(O<sub>2</sub>) = P(total) &minus; P(He) = 3.00 &minus; 1.96 = 1.04 atm. n(O<sub>2</sub>) = PV/RT = (1.04)(5.00)/[(0.08206)(298.15)] = 5.20/24.47 = 0.213 mol</li>
+        <li>At constant V and n, P scales with T: P&#8322; = P&#8321; &times; (T&#8322;/T&#8321;) = 3.00 &times; (348.15/298.15) = 3.50 atm</li>
+      </ol>
+      <p class="final">P(He) = 1.96 atm &middot; mol O<sub>2</sub> = 0.213 mol &middot; New P(total) = 3.50 atm</p>`
+    },
+    { type:'challenge',
+      q:'A 2.00 L flask contains N<sub>2</sub> and Ar at 27.0&deg;C. The mole fraction of N<sub>2</sub> is 0.600 and the total pressure is 1.50 atm. (a) Find the partial pressure of each gas. (b) Find the moles of Ar present. (c) If 0.0500 mol more N<sub>2</sub> is added at constant volume and temperature, find the new total pressure.',
+      solution:`<ol>
+        <li>P(N<sub>2</sub>) = 0.600 &times; 1.50 = 0.900 atm; P(Ar) = 1.50 &minus; 0.900 = 0.600 atm</li>
+        <li>n(Ar) = PV/RT = (0.600)(2.00)/[(0.08206)(300.15)] = 1.20/24.63 = 0.0487 mol</li>
+        <li>Initial n(N<sub>2</sub>) = P(N<sub>2</sub>)V/RT = (0.900)(2.00)/24.63 = 0.0731 mol. After adding 0.0500 mol: n(N<sub>2</sub>) = 0.1231 mol</li>
+        <li>New total moles = 0.1231 + 0.0487 = 0.1718 mol. New P(total) = nRT/V = (0.1718)(0.08206)(300.15)/2.00 = 4.231/2.00</li>
+      </ol>
+      <p class="final">P(N<sub>2</sub>) = 0.900 atm &middot; P(Ar) = 0.600 atm &middot; mol Ar = 0.0487 mol &middot; New P(total) &asymp; 2.12 atm</p>`
+    }
+  ]},
+  { id:'kmt', label:'Kinetic Theory & Effusion', prefix:'K', questions:[
+    { type:'mcq',
+      q:'According to kinetic molecular theory, which statement is true for an ideal gas at constant temperature?',
+      choices:['All molecules move at the same speed','Average kinetic energy depends only on temperature','Heavier molecules move faster on average than lighter ones','Gas molecules experience significant attractive forces'],
+      correct:1,
+      explanation:'A core KMT postulate: average kinetic energy of gas particles depends only on absolute temperature, not on identity or mass of the gas.'
+    },
+    { type:'mcq',
+      q:'At the same temperature, how many times faster does H<sub>2</sub> effuse than O<sub>2</sub>?',
+      choices:['0.25&times;','2.0&times;','4.0&times;','15.9&times;'],
+      correct:2,
+      explanation:'Graham&rsquo;s law: rate&#8321;/rate&#8322; = &radic;(M&#8322;/M&#8321;) = &radic;(32.00/2.016) = &radic;15.87 = 3.98 &asymp; 4.0.'
+    },
+    { type:'mcq',
+      q:'An unknown gas effuses 0.462 times as fast as O<sub>2</sub> under the same conditions. What is its molar mass?',
+      choices:['6.83 g/mol','14.8 g/mol','68.3 g/mol','150 g/mol'],
+      correct:3,
+      explanation:'0.462 = &radic;(32.00/M). Squaring: 0.2134 = 32.00/M, so M = 32.00/0.2134 &asymp; 150 g/mol.'
+    },
+    { type:'mcq',
+      q:'Which best explains why real gases deviate from ideal behavior at high pressure and low temperature?',
+      choices:['Gas molecules occupy a significant fraction of the container volume and intermolecular attractions become significant','The average kinetic energy of the molecules increases sharply','Gas molecules stop moving completely at low temperature','The value of the ideal gas constant R changes under these conditions'],
+      correct:0,
+      explanation:'At high pressure molecules are pushed close together (their own volume is no longer negligible) and at low temperature they move slowly enough for intermolecular attractions to matter &mdash; both violate core assumptions of the ideal gas model. R is a constant; molecules never fully stop moving; and KE decreases (not increases) as temperature drops.'
+    },
+    { type:'challenge',
+      q:'In a two-bulb effusion apparatus, it takes 4.50 min for a given amount of He to effuse and 22.6 min for the same molar amount of unknown gas X. Determine the molar mass of X.',
+      solution:`<ol>
+        <li>For equal amounts, rate &prop; 1/time, so rate(He)/rate(X) = time(X)/time(He) = 22.6/4.50 = 5.02</li>
+        <li>Graham&rsquo;s law: rate(He)/rate(X) = &radic;[M(X)/M(He)]</li>
+        <li>5.02&sup2; = 25.2 = M(X)/4.003 &rarr; M(X) = 25.2 &times; 4.003</li>
+      </ol>
+      <p class="final">M(X) &asymp; 101 g/mol</p>`
+    },
+    { type:'challenge',
+      q:'Two identical flasks at the same temperature contain equal masses of Ne gas and Ar gas. (a) Which flask has the greater number of moles? (b) Which gas has the greater average molecular speed? (c) If both flasks have the same volume, which has the higher pressure? Justify each answer.',
+      solution:`<ol>
+        <li>Equal mass, different molar mass: Ne = 20.18 g/mol, Ar = 39.95 g/mol. Since mol = mass/molar mass, the lighter gas (Ne) has more moles for the same mass.</li>
+        <li>Average kinetic energy depends only on temperature, so at equal T both gases have the same average KE. Since KE = &frac12;mv&sup2;, the lighter molecule (Ne) must have a higher average speed to have the same KE as the heavier Ar.</li>
+        <li>P = nRT/V. Same V and T, but Ne has more moles, so Ne exerts the higher pressure.</li>
+      </ol>
+      <p class="final">(a) Ne has more moles &middot; (b) Ne molecules move faster on average &middot; (c) The Ne flask has the higher pressure</p>`
+    }
+  ]}
+];
+
+const state = {}; // key: "topicIndex-qIndex" -> boolean (currently correct)
+let mcqTotal = 0;
+TOPICS.forEach(t => t.questions.forEach(q => { if(q.type==='mcq') mcqTotal++; }));
+document.getElementById('score-total').textContent = mcqTotal;
+
+function renderNav(){
+  const nav = document.getElementById('topic-nav');
+  nav.innerHTML = TOPICS.map((t,i) =>
+    `<button data-idx="${i}" class="${i===0?'active':''}">${t.prefix} &middot; ${t.label}</button>`
+  ).join('');
+  nav.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      nav.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.topic-section').forEach(s=>s.classList.remove('active'));
+      document.getElementById('section-'+btn.dataset.idx).classList.add('active');
+    });
+  });
+}
+
+function renderMain(){
+  const main = document.getElementById('main');
+  main.innerHTML = TOPICS.map((t,ti) => `
+    <section class="topic-section ${ti===0?'active':''}" id="section-${ti}">
+      <div class="topic-heading">
+        <span class="num mono">UNIT &middot; ${t.prefix}</span>
+        <h2>${t.label}</h2>
+      </div>
+      ${t.questions.map((q,qi)=> renderCard(q,ti,qi,t.prefix)).join('')}
+    </section>
+  `).join('');
+}
+
+function renderCard(q,ti,qi,prefix){
+  const tag = `${prefix}-${String(qi+1).padStart(2,'0')}`;
+  if(q.type==='mcq'){
+    return `
+    <div class="card" id="card-${ti}-${qi}">
+      <span class="tag mono">${tag}</span>
+      <p class="q-text">${q.q}</p>
+      <div class="choices">
+        ${q.choices.map((c,ci)=>`<button class="choice" data-ti="${ti}" data-qi="${qi}" data-ci="${ci}">${c}</button>`).join('')}
+      </div>
+      <div class="feedback" id="fb-${ti}-${qi}"></div>
+    </div>`;
+  } else {
+    return `
+    <div class="card challenge" id="card-${ti}-${qi}">
+      <span class="tag mono">${tag} &middot; challenge</span>
+      <p class="q-text">${q.q}</p>
+      <button class="reveal-btn" data-ti="${ti}" data-qi="${qi}">Reveal step-by-step solution</button>
+      <div class="solution" id="sol-${ti}-${qi}">${q.solution}</div>
+    </div>`;
+  }
+}
+
+function attachHandlers(){
+  document.querySelectorAll('.choice').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const ti = +btn.dataset.ti, qi = +btn.dataset.qi, ci = +btn.dataset.ci;
+      const q = TOPICS[ti].questions[qi];
+      const card = document.getElementById(`card-${ti}-${qi}`);
+      const fb = document.getElementById(`fb-${ti}-${qi}`);
+      const allChoices = card.querySelectorAll('.choice');
+      allChoices.forEach(c=>c.disabled = true);
+      const key = ti+'-'+qi;
+      if(ci === q.correct){
+        btn.classList.add('is-correct');
+        card.classList.add('correct'); card.classList.remove('incorrect');
+        fb.innerHTML = `<span class="label">Correct</span>${q.explanation}`;
+        fb.className = 'feedback show good';
+        if(!state[key]){ state[key] = true; updateGauge(); }
+      } else {
+        btn.classList.add('is-incorrect');
+        allChoices[q.correct].classList.add('is-correct');
+        card.classList.add('incorrect'); card.classList.remove('correct');
+        fb.innerHTML = `<span class="label">Not quite</span>${q.explanation}`;
+        fb.className = 'feedback show bad';
+        state[key] = false;
+        updateGauge();
+      }
+    });
+  });
+  document.querySelectorAll('.reveal-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const ti = btn.dataset.ti, qi = btn.dataset.qi;
+      const sol = document.getElementById(`sol-${ti}-${qi}`);
+      const showing = sol.classList.toggle('show');
+      btn.textContent = showing ? 'Hide solution' : 'Reveal step-by-step solution';
+    });
+  });
+}
+
+function updateGauge(){
+  const correctCount = Object.values(state).filter(Boolean).length;
+  document.getElementById('score-num').textContent = correctCount;
+  const pct = mcqTotal ? correctCount / mcqTotal : 0;
+  const circumference = 188.5;
+  document.getElementById('gauge-fill').setAttribute('stroke-dashoffset', circumference - (circumference*pct));
+  const angle = -90 + (pct*180);
+  document.getElementById('needle').setAttribute('transform', `rotate(${angle} 75 78)`);
+}
+
+document.getElementById('reset-btn').addEventListener('click', ()=>{
+  Object.keys(state).forEach(k=>delete state[k]);
+  renderMain();
+  attachHandlers();
+  updateGauge();
+  document.querySelectorAll('.reveal-btn').forEach(b=>b.textContent='Reveal step-by-step solution');
+});
+
+renderNav();
+renderMain();
+attachHandlers();
+updateGauge();
+</script>
+</body>
+</html>
