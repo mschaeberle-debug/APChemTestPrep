@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Foundations Review — Thermochemistry & Chemical Thermodynamics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #16241f;
+    --bg-alt: #1d2f28;
+    --card: #1b2b25;
+    --ink: #f1ede4;
+    --ink-dim: #a9b6ae;
+    --accent: #e8a93e;
+    --accent-dim: #8a6a2e;
+    --correct: #7fa687;
+    --correct-bg: rgba(127,166,135,0.14);
+    --incorrect: #c1554b;
+    --incorrect-bg: rgba(193,85,75,0.14);
+    --rule: rgba(241,237,228,0.16);
+    --grid: rgba(241,237,228,0.045);
+  }
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    background-color:var(--bg);
+    background-image:
+      repeating-linear-gradient(0deg, var(--grid) 0px, var(--grid) 1px, transparent 1px, transparent 28px),
+      repeating-linear-gradient(90deg, var(--grid) 0px, var(--grid) 1px, transparent 1px, transparent 28px);
+    color:var(--ink);
+    font-family:'Source Serif 4', Georgia, serif;
+    line-height:1.5;
+    min-height:100vh;
+  }
+  .mono{ font-family:'Space Mono', monospace; }
+  a{ color:inherit; }
+
+  /* ---------- Header ---------- */
+  header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:24px;
+    padding:32px clamp(16px,4vw,48px) 20px;
+    border-bottom:1px solid var(--rule);
+    flex-wrap:wrap;
+  }
+  .title-block .eyebrow{
+    font-family:'Space Mono', monospace;
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin:0 0 6px;
+  }
+  .title-block h1{
+    margin:0;
+    font-size:clamp(24px,3.4vw,34px);
+    font-weight:700;
+    letter-spacing:-0.01em;
+  }
+  .title-block p{
+    margin:6px 0 0;
+    color:var(--ink-dim);
+    font-size:15px;
+  }
+
+  /* ---------- Gauge (signature element) ---------- */
+  .gauge-wrap{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:2px;
+    min-width:150px;
+  }
+  .gauge-wrap svg{ width:150px; height:90px; overflow:visible; }
+  .gauge-readout{
+    font-family:'Space Mono', monospace;
+    font-size:13px;
+    color:var(--ink-dim);
+    letter-spacing:.04em;
+  }
+  .gauge-readout strong{ color:var(--ink); }
+  #needle{ transform-origin:75px 78px; transition: transform .5s cubic-bezier(.3,1.4,.4,1); }
+
+  /* ---------- Topic nav ---------- */
+  nav{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    padding:20px clamp(16px,4vw,48px);
+    position:sticky;
+    top:0;
+    background:linear-gradient(var(--bg) 85%, transparent);
+    z-index:10;
+  }
+  nav button{
+    font-family:'Space Mono', monospace;
+    font-size:12px;
+    letter-spacing:.03em;
+    color:var(--ink-dim);
+    background:transparent;
+    border:1px solid var(--rule);
+    border-radius:100px;
+    padding:8px 16px;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  nav button:hover{ border-color:var(--accent-dim); color:var(--ink); }
+  nav button.active{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#1b2b25;
+    font-weight:700;
+  }
+  nav button:focus-visible, button:focus-visible, .choice:focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:2px;
+  }
+
+  main{ padding:8px clamp(16px,4vw,48px) 80px; max-width:820px; margin:0 auto; }
+  .topic-section{ display:none; }
+  .topic-section.active{ display:block; animation:fade .25s ease; }
+  @keyframes fade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+
+  .topic-heading{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    margin:28px 0 18px;
+  }
+  .topic-heading .num{
+    font-family:'Space Mono', monospace;
+    color:var(--accent);
+    font-size:13px;
+  }
+  .topic-heading h2{ margin:0; font-size:20px; font-weight:700; }
+
+  /* ---------- Question cards ---------- */
+  .card{
+    background:var(--card);
+    border:1px solid var(--rule);
+    border-left:3px solid var(--accent-dim);
+    border-radius:4px;
+    padding:22px 24px;
+    margin-bottom:18px;
+    position:relative;
+  }
+  .card.correct{ border-left-color:var(--correct); }
+  .card.incorrect{ border-left-color:var(--incorrect); }
+  .tag{
+    position:absolute;
+    top:-10px;
+    left:20px;
+    background:var(--bg);
+    border:1px solid var(--rule);
+    font-family:'Space Mono', monospace;
+    font-size:11px;
+    letter-spacing:.06em;
+    color:var(--ink-dim);
+    padding:2px 8px;
+    border-radius:3px;
+  }
+  .card.challenge .tag{ color:var(--accent); border-color:var(--accent-dim); }
+  .q-text{ margin:6px 0 16px; font-size:16.5px; }
+  .q-text sub{ font-size:.7em; }
+
+  .choices{ display:flex; flex-direction:column; gap:8px; }
+  .choice{
+    text-align:left;
+    font-family:'Source Serif 4', serif;
+    font-size:15px;
+    background:transparent;
+    border:1px solid var(--rule);
+    border-radius:4px;
+    padding:10px 14px;
+    color:var(--ink);
+    cursor:pointer;
+    transition:all .12s ease;
+  }
+  .choice:hover:not(:disabled){ border-color:var(--accent); background:rgba(232,169,62,0.06); }
+  .choice:disabled{ cursor:default; }
+  .choice.is-correct{ border-color:var(--correct); background:var(--correct-bg); }
+  .choice.is-incorrect{ border-color:var(--incorrect); background:var(--incorrect-bg); }
+
+  .feedback{
+    margin-top:14px;
+    padding:12px 14px;
+    border-radius:4px;
+    font-size:14.5px;
+    display:none;
+  }
+  .feedback.show{ display:block; }
+  .feedback.good{ background:var(--correct-bg); border:1px solid var(--correct); }
+  .feedback.bad{ background:var(--incorrect-bg); border:1px solid var(--incorrect); }
+  .feedback .label{ font-family:'Space Mono', monospace; font-size:11px; letter-spacing:.06em; text-transform:uppercase; display:block; margin-bottom:4px; }
+  .feedback.good .label{ color:var(--correct); }
+  .feedback.bad .label{ color:var(--incorrect); }
+
+  .reveal-btn{
+    font-family:'Space Mono', monospace;
+    font-size:12.5px;
+    letter-spacing:.03em;
+    background:transparent;
+    border:1px solid var(--accent-dim);
+    color:var(--accent);
+    border-radius:4px;
+    padding:9px 16px;
+    cursor:pointer;
+  }
+  .reveal-btn:hover{ background:rgba(232,169,62,0.1); }
+  .solution{
+    display:none;
+    margin-top:16px;
+    padding:16px 18px;
+    background:rgba(232,169,62,0.06);
+    border:1px dashed var(--accent-dim);
+    border-radius:4px;
+    font-size:14.5px;
+  }
+  .solution.show{ display:block; }
+  .solution ol{ margin:6px 0 0; padding-left:20px; }
+  .solution li{ margin-bottom:6px; }
+  .solution .final{ font-family:'Space Mono', monospace; color:var(--accent); }
+
+  footer{
+    text-align:center;
+    padding:24px;
+    color:var(--ink-dim);
+    font-family:'Space Mono', monospace;
+    font-size:12px;
+    border-top:1px solid var(--rule);
+  }
+  footer button{
+    background:none; border:none; color:var(--ink-dim); text-decoration:underline;
+    cursor:pointer; font-family:'Space Mono', monospace; font-size:12px;
+  }
+  footer button:hover{ color:var(--accent); }
+
+  @media (max-width:560px){
+    header{ flex-direction:column; align-items:flex-start; }
+    .gauge-wrap{ align-self:center; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title-block">
+    <p class="eyebrow">AP Chemistry &middot; Test Review</p>
+    <h1>Thermochemistry &amp; Chemical Thermodynamics</h1>
+    <p>36 problems across 6 topics &mdash; 4 multiple-choice and 2 free-response per topic. Work each one on paper before checking &mdash; the gauge tracks live accuracy on the multiple-choice items.</p>
+  </div>
+  <div class="gauge-wrap">
+    <svg viewBox="0 0 150 90">
+      <path d="M 15 78 A 60 60 0 0 1 135 78" fill="none" stroke="rgba(241,237,228,0.14)" stroke-width="10" stroke-linecap="round"/>
+      <path id="gauge-fill" d="M 15 78 A 60 60 0 0 1 135 78" fill="none" stroke="var(--accent)" stroke-width="10" stroke-linecap="round" stroke-dasharray="188.5" stroke-dashoffset="188.5"/>
+      <g id="needle">
+        <line x1="75" y1="78" x2="75" y2="26" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="75" cy="78" r="5" fill="var(--ink)"/>
+      </g>
+    </svg>
+    <div class="gauge-readout"><strong id="score-num">0</strong> / <span id="score-total">18</span> correct</div>
+  </div>
+</header>
+
+<nav id="topic-nav"></nav>
+<main id="main"></main>
+
+<footer>
+  <button id="reset-btn">reset all progress</button>
+</footer>
+
+<script>
+const TOPICS = [
+  { id:'calorimetry', label:'Calorimetry & Heat Capacity', prefix:'C', questions:[
+    { type:'mcq',
+      q:'A 50.0 g piece of aluminum at 100.0&deg;C is dropped into 100.0 g of water at 20.0&deg;C in an insulated calorimeter. The final temperature is 27.8&deg;C. Calculate the specific heat capacity of the aluminum. (specific heat of water = 4.184 J/g&middot;&deg;C)',
+      choices:['0.385 J/(g&middot;&deg;C)','0.449 J/(g&middot;&deg;C)','0.904 J/(g&middot;&deg;C)','4.184 J/(g&middot;&deg;C)'],
+      correct:2,
+      explanation:'Heat gained by water = &minus;heat lost by metal. q<sub>water</sub> = (100.0)(4.184)(27.8&minus;20.0) = 3263.5 J. Setting q<sub>metal</sub> = &minus;3263.5 J = (50.0)(c)(27.8&minus;100.0): c = 3263.5 / (50.0 &times; 72.2) &asymp; 0.904 J/(g&middot;&deg;C), consistent with aluminum. The other values are the specific heats of copper, iron, and water itself.'
+    },
+    { type:'mcq',
+      q:'How much heat (in kJ) is required to raise the temperature of 250. g of water from 15.0&deg;C to 85.0&deg;C? (c<sub>water</sub> = 4.184 J/g&middot;&deg;C)',
+      choices:['7.32 kJ','29.3 kJ','73.2 kJ','146 kJ'],
+      correct:2,
+      explanation:'q = mc&Delta;T = (250.)(4.184)(70.0) = 73,220 J = 73.2 kJ. The other options come from misplacing a decimal or using the wrong &Delta;T.'
+    },
+    { type:'mcq',
+      q:'How much energy (in kJ) is required to convert 36.0 g of ice at 0.0&deg;C completely into steam at 100.0&deg;C? (&Delta;H<sub>fus</sub> = 6.01 kJ/mol, &Delta;H<sub>vap</sub> = 40.7 kJ/mol, c<sub>water(l)</sub> = 4.184 J/g&middot;&deg;C, molar mass H<sub>2</sub>O = 18.02 g/mol)',
+      choices:['27.1 kJ','81.3 kJ','96.4 kJ','108 kJ'],
+      correct:3,
+      explanation:'mol H<sub>2</sub>O = 36.0/18.02 = 2.00 mol. Melting: 2.00 &times; 6.01 = 12.0 kJ. Heating liquid 0&rarr;100&deg;C: (36.0)(4.184)(100) = 15.06 kJ. Vaporizing: 2.00 &times; 40.7 = 81.3 kJ. Total = 12.0 + 15.06 + 81.3 = 108 kJ. The distractors skip one or more of the three steps in the heating curve.'
+    },
+    { type:'mcq',
+      q:'A coffee-cup calorimeter contains 150.0 g of water at 24.6&deg;C. When 5.00 g of an ionic solid dissolves, the temperature drops to 19.8&deg;C. Treating the total solution mass (155.0 g) with c = 4.184 J/g&middot;&deg;C, is the dissolution exothermic or endothermic, and what is the magnitude of q?',
+      choices:['Exothermic, releases 3.11 kJ','Endothermic, absorbs 3.11 kJ','Exothermic, releases 3.01 kJ','Endothermic, absorbs 3.01 kJ'],
+      correct:1,
+      explanation:'q<sub>solution</sub> = (155.0)(4.184)(19.8&minus;24.6) = &minus;3112 J. The water itself lost heat, which means that heat was absorbed by the dissolving process &mdash; so dissolution is endothermic, absorbing about 3.11 kJ. The 3.01 kJ options come from mistakenly using only the water&rsquo;s mass (150.0 g) instead of the total solution mass.'
+    },
+    { type:'challenge',
+      q:'A 4.00 g sample of an unknown hydrocarbon fuel is burned completely in a bomb calorimeter containing 1200. g of water. The water temperature rises from 21.0&deg;C to 34.6&deg;C. The calorimeter itself (excluding the water) has a heat capacity of 850. J/&deg;C. (a) Calculate the total heat released by the combustion. (b) Calculate the heat released per gram of fuel.',
+      solution:`<ol>
+        <li>q<sub>water</sub> = mc&Delta;T = (1200.)(4.184)(34.6&minus;21.0) = (1200.)(4.184)(13.6) = 68,280 J &asymp; 68.28 kJ</li>
+        <li>q<sub>calorimeter</sub> = C&Delta;T = (850.)(13.6) = 11,560 J = 11.56 kJ</li>
+        <li>Total heat released = 68.28 + 11.56 = 79.84 kJ</li>
+        <li>Heat per gram = 79.84 kJ &divide; 4.00 g</li>
+      </ol>
+      <p class="final">Total heat released &asymp; 79.8 kJ &middot; Heat released per gram &asymp; 20.0 kJ/g</p>`
+    },
+    { type:'challenge',
+      q:'A 15.0 g sample of ice at &minus;10.0&deg;C is heated until it becomes steam at 120.0&deg;C. Using c<sub>ice</sub> = 2.09 J/g&middot;&deg;C, c<sub>water(l)</sub> = 4.184 J/g&middot;&deg;C, c<sub>steam</sub> = 2.01 J/g&middot;&deg;C, &Delta;H<sub>fus</sub> = 334 J/g, and &Delta;H<sub>vap</sub> = 2260 J/g, calculate the total energy required for the entire process.',
+      solution:`<ol>
+        <li>Heat ice from &minus;10.0 to 0.0&deg;C: q<sub>1</sub> = (15.0)(2.09)(10.0) = 313.5 J</li>
+        <li>Melt ice at 0.0&deg;C: q<sub>2</sub> = (15.0)(334) = 5010 J</li>
+        <li>Heat liquid water from 0.0 to 100.0&deg;C: q<sub>3</sub> = (15.0)(4.184)(100.0) = 6276 J</li>
+        <li>Vaporize water at 100.0&deg;C: q<sub>4</sub> = (15.0)(2260) = 33,900 J</li>
+        <li>Heat steam from 100.0 to 120.0&deg;C: q<sub>5</sub> = (15.0)(2.01)(20.0) = 603 J</li>
+        <li>Total = 313.5 + 5010 + 6276 + 33,900 + 603 = 46,102.5 J</li>
+      </ol>
+      <p class="final">Total energy required &asymp; 46.1 kJ</p>`
+    }
+  ]},
+  { id:'enthalpy', label:'Enthalpy & Hess\u2019s Law', prefix:'H', questions:[
+    { type:'mcq',
+      q:'Given: C(s) + O<sub>2</sub>(g) &rarr; CO<sub>2</sub>(g), &Delta;H = &minus;393.5 kJ; H<sub>2</sub>(g) + &frac12;O<sub>2</sub>(g) &rarr; H<sub>2</sub>O(l), &Delta;H = &minus;285.8 kJ; C<sub>2</sub>H<sub>2</sub>(g) + &frac52;O<sub>2</sub>(g) &rarr; 2CO<sub>2</sub>(g) + H<sub>2</sub>O(l), &Delta;H = &minus;1299.6 kJ. Calculate &Delta;H<sub>f</sub>&deg; for C<sub>2</sub>H<sub>2</sub>(g): 2C(s) + H<sub>2</sub>(g) &rarr; C<sub>2</sub>H<sub>2</sub>(g).',
+      choices:['&minus;226.8 kJ/mol','+226.8 kJ/mol','&minus;1979.9 kJ/mol','+1299.6 kJ/mol'],
+      correct:1,
+      explanation:'Target = 2&times;(reaction 1) + (reaction 2) &minus; (reaction 3): &Delta;H = 2(&minus;393.5) + (&minus;285.8) &minus; (&minus;1299.6) = &minus;787.0 &minus; 285.8 + 1299.6 = +226.8 kJ. Forgetting to flip the sign when subtracting reaction 3, or simply adding all three values, gives the other choices.'
+    },
+    { type:'mcq',
+      q:'Using standard enthalpies of formation (&Delta;H<sub>f</sub>&deg;, kJ/mol): CO<sub>2</sub>(g) = &minus;393.5, H<sub>2</sub>O(g) = &minus;241.8, C<sub>3</sub>H<sub>8</sub>(g) = &minus;103.8, O<sub>2</sub>(g) = 0, calculate &Delta;H&deg;<sub>rxn</sub> for: C<sub>3</sub>H<sub>8</sub>(g) + 5O<sub>2</sub>(g) &rarr; 3CO<sub>2</sub>(g) + 4H<sub>2</sub>O(g).',
+      choices:['&minus;2251.5 kJ','&minus;2043.9 kJ','&minus;1939.9 kJ','+2043.9 kJ'],
+      correct:1,
+      explanation:'&Delta;H&deg;<sub>rxn</sub> = [3(&minus;393.5) + 4(&minus;241.8)] &minus; [(&minus;103.8) + 5(0)] = (&minus;1180.5 &minus; 967.2) &minus; (&minus;103.8) = &minus;2147.7 + 103.8 = &minus;2043.9 kJ. The other values come from forgetting to subtract the reactant term or flipping a sign.'
+    },
+    { type:'mcq',
+      q:'Which statement best explains why Hess&rsquo;s Law is valid?',
+      choices:['Enthalpy is a state function, so &Delta;H for a reaction depends only on initial and final states, not on the pathway','Enthalpy is not conserved in chemical reactions','All reactions release the same amount of energy regardless of pathway','&Delta;H values must always be measured directly and cannot be calculated indirectly'],
+      correct:0,
+      explanation:'Hess&rsquo;s Law works precisely because enthalpy is a state function: the net &Delta;H for going from reactants to products is independent of the route taken, so individual steps can be added and subtracted freely.'
+    },
+    { type:'mcq',
+      q:'Given: N<sub>2</sub>(g) + O<sub>2</sub>(g) &rarr; 2NO(g), &Delta;H = +180.6 kJ. What is &Delta;H for: 4NO(g) &rarr; 2N<sub>2</sub>(g) + 2O<sub>2</sub>(g)?',
+      choices:['&minus;180.6 kJ','+180.6 kJ','&minus;361.2 kJ','+361.2 kJ'],
+      correct:2,
+      explanation:'Reversing the given reaction flips the sign to &minus;180.6 kJ (for 2NO &rarr; N<sub>2</sub> + O<sub>2</sub>). Doubling that reaction to get 4NO &rarr; 2N<sub>2</sub> + 2O<sub>2</sub> doubles &Delta;H: 2 &times; (&minus;180.6) = &minus;361.2 kJ.'
+    },
+    { type:'challenge',
+      q:'Use the following thermochemical equations: (1) 2Fe(s) + &frac32;O<sub>2</sub>(g) &rarr; Fe<sub>2</sub>O<sub>3</sub>(s), &Delta;H<sub>1</sub> = &minus;824.2 kJ; (2) CO(g) + &frac12;O<sub>2</sub>(g) &rarr; CO<sub>2</sub>(g), &Delta;H<sub>2</sub> = &minus;283.0 kJ. Calculate &Delta;H for: Fe<sub>2</sub>O<sub>3</sub>(s) + 3CO(g) &rarr; 2Fe(s) + 3CO<sub>2</sub>(g).',
+      solution:`<ol>
+        <li>Reverse reaction (1): Fe<sub>2</sub>O<sub>3</sub>(s) &rarr; 2Fe(s) + &frac32;O<sub>2</sub>(g), &Delta;H = +824.2 kJ</li>
+        <li>Multiply reaction (2) by 3: 3CO(g) + &frac32;O<sub>2</sub>(g) &rarr; 3CO<sub>2</sub>(g), &Delta;H = 3(&minus;283.0) = &minus;849.0 kJ</li>
+        <li>Add the two modified equations: the &frac32;O<sub>2</sub>(g) cancels from both sides, leaving Fe<sub>2</sub>O<sub>3</sub>(s) + 3CO(g) &rarr; 2Fe(s) + 3CO<sub>2</sub>(g)</li>
+        <li>&Delta;H<sub>total</sub> = 824.2 + (&minus;849.0)</li>
+      </ol>
+      <p class="final">&Delta;H &asymp; &minus;24.8 kJ</p>`
+    },
+    { type:'challenge',
+      q:'The combustion of ethanol is represented by: C<sub>2</sub>H<sub>5</sub>OH(l) + 3O<sub>2</sub>(g) &rarr; 2CO<sub>2</sub>(g) + 3H<sub>2</sub>O(l). Using &Delta;H<sub>f</sub>&deg; (kJ/mol): C<sub>2</sub>H<sub>5</sub>OH(l) = &minus;277.6, CO<sub>2</sub>(g) = &minus;393.5, H<sub>2</sub>O(l) = &minus;285.8, O<sub>2</sub>(g) = 0. (a) Calculate &Delta;H&deg;<sub>rxn</sub> per mole of ethanol combusted. (b) How much heat is released when 0.500 mol of ethanol is combusted?',
+      solution:`<ol>
+        <li>&Delta;H&deg;<sub>rxn</sub> = [2(&minus;393.5) + 3(&minus;285.8)] &minus; [(&minus;277.6) + 3(0)]</li>
+        <li>= (&minus;787.0 &minus; 857.4) &minus; (&minus;277.6) = &minus;1644.4 + 277.6 = &minus;1366.8 kJ/mol</li>
+        <li>Heat released for 0.500 mol = 0.500 &times; 1366.8 kJ</li>
+      </ol>
+      <p class="final">&Delta;H&deg;<sub>rxn</sub> = &minus;1366.8 kJ/mol &middot; Heat released for 0.500 mol &asymp; 683 kJ</p>`
+    }
+  ]},
+  { id:'bonds', label:'Bond Enthalpies', prefix:'B', questions:[
+    { type:'mcq',
+      q:'Using average bond enthalpies (kJ/mol): C&minus;H = 413, C&minus;C = 347, C=C = 614, H&minus;H = 436, estimate &Delta;H for: CH<sub>2</sub>=CH<sub>2</sub>(g) + H<sub>2</sub>(g) &rarr; CH<sub>3</sub>&minus;CH<sub>3</sub>(g).',
+      choices:['&minus;123 kJ','+123 kJ','&minus;1050 kJ','+290 kJ'],
+      correct:0,
+      explanation:'Bonds broken: 1 C=C + 1 H&minus;H = 614 + 436 = 1050 kJ. Bonds formed: 1 new C&minus;C + 2 new C&minus;H (ethane has 2 more C&minus;H bonds than ethylene) = 347 + 2(413) = 1173 kJ. &Delta;H = bonds broken &minus; bonds formed = 1050 &minus; 1173 = &minus;123 kJ.'
+    },
+    { type:'mcq',
+      q:'Using bond enthalpies (kJ/mol): H&minus;H = 436, Cl&minus;Cl = 243, H&minus;Cl = 432, calculate &Delta;H for: H<sub>2</sub>(g) + Cl<sub>2</sub>(g) &rarr; 2HCl(g).',
+      choices:['&minus;1543 kJ','&minus;679 kJ','&minus;185 kJ','+185 kJ'],
+      correct:2,
+      explanation:'Bonds broken: 436 + 243 = 679 kJ. Bonds formed: 2(432) = 864 kJ. &Delta;H = 679 &minus; 864 = &minus;185 kJ.'
+    },
+    { type:'mcq',
+      q:'Which best explains why bond-enthalpy calculations of &Delta;H<sub>rxn</sub> are only approximate, unlike Hess&rsquo;s Law calculations from &Delta;H<sub>f</sub>&deg; values?',
+      choices:['Average bond enthalpies are averaged across many different molecules and don&rsquo;t reflect the specific molecular environment of a given bond','Bond enthalpies can only be measured for diatomic molecules','Bond enthalpies change with temperature but &Delta;H<sub>f</sub>&deg; values do not','Bond-enthalpy calculations violate conservation of energy'],
+      correct:0,
+      explanation:'Tabulated bond enthalpies are averages taken over many compounds containing that bond type, so they don&rsquo;t capture the exact strength of a bond in any one specific molecule &mdash; which is why they only give an estimate of &Delta;H<sub>rxn</sub>.'
+    },
+    { type:'mcq',
+      q:'Using bond enthalpies (kJ/mol): C&minus;H = 413, O=O = 495, C=O (in CO<sub>2</sub>) = 799, O&minus;H = 467, estimate &Delta;H for: CH<sub>4</sub>(g) + 2O<sub>2</sub>(g) &rarr; CO<sub>2</sub>(g) + 2H<sub>2</sub>O(g).',
+      choices:['&minus;3466 kJ','&minus;2642 kJ','&minus;824 kJ','+824 kJ'],
+      correct:2,
+      explanation:'Bonds broken: 4(413) + 2(495) = 1652 + 990 = 2642 kJ. Bonds formed: 2(799) + 4(467) = 1598 + 1868 = 3466 kJ. &Delta;H = 2642 &minus; 3466 = &minus;824 kJ.'
+    },
+    { type:'challenge',
+      q:'Using average bond enthalpies (kJ/mol): C&minus;H = 413, C&minus;Cl = 339, Cl&minus;Cl = 243, H&minus;Cl = 432, estimate &Delta;H for: CH<sub>3</sub>&minus;CH<sub>3</sub>(g) + Cl<sub>2</sub>(g) &rarr; CH<sub>3</sub>&minus;CH<sub>2</sub>Cl(g) + HCl(g). Show all bonds broken and formed.',
+      solution:`<ol>
+        <li>Bonds broken: 1 C&minus;H + 1 Cl&minus;Cl = 413 + 243 = 656 kJ</li>
+        <li>Bonds formed: 1 C&minus;Cl + 1 H&minus;Cl = 339 + 432 = 771 kJ</li>
+        <li>&Delta;H = bonds broken &minus; bonds formed = 656 &minus; 771</li>
+      </ol>
+      <p class="final">&Delta;H &asymp; &minus;115 kJ</p>`
+    },
+    { type:'challenge',
+      q:'For N<sub>2</sub>(g) + 3H<sub>2</sub>(g) &rarr; 2NH<sub>3</sub>(g): (a) Using bond enthalpies N&equiv;N = 941 kJ/mol, H&minus;H = 436 kJ/mol, N&minus;H = 391 kJ/mol, estimate &Delta;H<sub>rxn</sub>. (b) The actual &Delta;H&deg;<sub>rxn</sub> from formation data is &minus;92.2 kJ. Explain one reason the two values differ.',
+      solution:`<ol>
+        <li>Bonds broken: 1(N&equiv;N) + 3(H&minus;H) = 941 + 3(436) = 941 + 1308 = 2249 kJ</li>
+        <li>Bonds formed: each NH<sub>3</sub> has 3 N&minus;H bonds, so 2 NH<sub>3</sub> molecules have 6 N&minus;H bonds: 6(391) = 2346 kJ</li>
+        <li>&Delta;H<sub>rxn</sub> = 2249 &minus; 2346 = &minus;97 kJ</li>
+      </ol>
+      <p class="final">Estimated &Delta;H &asymp; &minus;97 kJ, close to but not identical to the experimental &minus;92.2 kJ. (b) Bond enthalpies are average values gathered across many different compounds, not measured specifically for N<sub>2</sub>, H<sub>2</sub>, or NH<sub>3</sub>, so the estimate doesn&rsquo;t exactly match the precise experimentally-derived value.</p>`
+    }
+  ]},
+  { id:'entropy', label:'Entropy & the Second Law', prefix:'E', questions:[
+    { type:'mcq',
+      q:'Predict the sign of &Delta;S&deg; for the reaction: 2SO<sub>2</sub>(g) + O<sub>2</sub>(g) &rarr; 2SO<sub>3</sub>(g).',
+      choices:['&Delta;S&deg; &gt; 0, because moles of gas increase','&Delta;S&deg; &gt; 0, because moles of gas decrease','&Delta;S&deg; &lt; 0, because moles of gas decrease','&Delta;S&deg; = 0, because the same elements are present on both sides'],
+      correct:2,
+      explanation:'3 mol of gas (2SO<sub>2</sub> + O<sub>2</sub>) become 2 mol of gas (2SO<sub>3</sub>). Fewer independently moving gas particles means fewer accessible microstates, so entropy decreases: &Delta;S&deg; &lt; 0.'
+    },
+    { type:'mcq',
+      q:'Using standard entropies (S&deg;, J/mol&middot;K): CH<sub>4</sub>(g) = 186.3, O<sub>2</sub>(g) = 205.2, CO<sub>2</sub>(g) = 213.8, H<sub>2</sub>O(g) = 188.8, calculate &Delta;S&deg; for: CH<sub>4</sub>(g) + 2O<sub>2</sub>(g) &rarr; CO<sub>2</sub>(g) + 2H<sub>2</sub>O(g).',
+      choices:['+591.4 J/K','+5.3 J/K','&minus;5.3 J/K','&minus;596.7 J/K'],
+      correct:2,
+      explanation:'&Delta;S&deg; = &Sigma;S&deg;(products) &minus; &Sigma;S&deg;(reactants) = [213.8 + 2(188.8)] &minus; [186.3 + 2(205.2)] = 591.4 &minus; 596.7 = &minus;5.3 J/K. The other options are the product sum alone, the reactant sum alone (sign-flipped), or a sign error.'
+    },
+    { type:'mcq',
+      q:'According to the second law of thermodynamics, which statement is true for a spontaneous process?',
+      choices:['&Delta;S<sub>system</sub> must always be positive','&Delta;S<sub>surroundings</sub> must always be positive','&Delta;S<sub>universe</sub> (system + surroundings) must be positive','&Delta;S<sub>universe</sub> must always equal zero'],
+      correct:2,
+      explanation:'The second law states that for any spontaneous process, the total entropy of the universe increases. Either the system or surroundings alone can decrease in entropy, as long as the sum increases.'
+    },
+    { type:'mcq',
+      q:'Which of the following processes has the largest increase in entropy?',
+      choices:['H<sub>2</sub>O(l) &rarr; H<sub>2</sub>O(g)','H<sub>2</sub>O(s) &rarr; H<sub>2</sub>O(l)','CO<sub>2</sub>(g) at 1 atm &rarr; CO<sub>2</sub>(g) at 10 atm, same T','NaCl(s) &rarr; NaCl(aq)'],
+      correct:0,
+      explanation:'Vaporization produces by far the largest entropy increase of common phase changes, since gas particles have vastly more accessible volume and disorder than a liquid. Melting and dissolution cause smaller increases, and compressing a gas at constant T actually decreases its entropy.'
+    },
+    { type:'challenge',
+      q:'Calculate &Delta;S&deg; for: N<sub>2</sub>(g) + 3H<sub>2</sub>(g) &rarr; 2NH<sub>3</sub>(g), given S&deg; (J/mol&middot;K): N<sub>2</sub>(g) = 191.6, H<sub>2</sub>(g) = 130.7, NH<sub>3</sub>(g) = 192.8. Then explain whether the sign of &Delta;S&deg; makes physical sense.',
+      solution:`<ol>
+        <li>&Delta;S&deg; = &Sigma;S&deg;(products) &minus; &Sigma;S&deg;(reactants) = 2(192.8) &minus; [191.6 + 3(130.7)]</li>
+        <li>= 385.6 &minus; (191.6 + 392.1) = 385.6 &minus; 583.7</li>
+      </ol>
+      <p class="final">&Delta;S&deg; &asymp; &minus;198.1 J/K. This makes sense: 4 mol of gas particles (1 N<sub>2</sub> + 3 H<sub>2</sub>) become only 2 mol of gas particles (2 NH<sub>3</sub>), decreasing the number of accessible microstates and therefore decreasing entropy &mdash; consistent with the negative &Delta;S&deg;.</p>`
+    },
+    { type:'challenge',
+      q:'The dissolution NH<sub>4</sub>NO<sub>3</sub>(s) &rarr; NH<sub>4</sub><sup>+</sup>(aq) + NO<sub>3</sub><sup>&minus;</sup>(aq) is spontaneous at room temperature even though it is endothermic (&Delta;H &gt; 0), and the solution feels cold. (a) Predict the sign of &Delta;S&deg; and justify it in terms of particle disorder. (b) Using &Delta;G = &Delta;H &minus; T&Delta;S, explain how a reaction with &Delta;H &gt; 0 can still be spontaneous at room temperature.',
+      solution:`<p>(a) &Delta;S&deg; is positive. The rigid, ordered ionic lattice of the solid breaks apart into freely moving, hydrated ions dispersed throughout the solvent &mdash; a large increase in the number of accessible microstates and disorder of the system.</p>
+      <p>(b) In &Delta;G = &Delta;H &minus; T&Delta;S, a sufficiently large positive &Delta;S makes the &minus;T&Delta;S term a large negative number. If that negative term outweighs the positive &Delta;H, the overall &Delta;G is negative even though the process absorbs heat &mdash; which is exactly why this dissolution is spontaneous despite feeling cold.</p>
+      <p class="final">&Delta;S&deg; &gt; 0, driven by increased disorder; the entropy increase (via &minus;T&Delta;S) outweighs the unfavorable positive &Delta;H at room temperature.</p>`
+    }
+  ]},
+  { id:'gibbs', label:'Gibbs Free Energy & Spontaneity', prefix:'G', questions:[
+    { type:'mcq',
+      q:'For a reaction with &Delta;H = &minus;120. kJ and &Delta;S = &minus;150. J/K at 298 K, calculate &Delta;G and determine if the reaction is spontaneous.',
+      choices:['&Delta;G = +75.3 kJ, not spontaneous','&Delta;G = &minus;75.3 kJ, spontaneous','&Delta;G = &minus;164.7 kJ, spontaneous','&Delta;G = +164.7 kJ, not spontaneous'],
+      correct:1,
+      explanation:'&Delta;G = &Delta;H &minus; T&Delta;S = &minus;120,000 J &minus; (298)(&minus;150. J/K) = &minus;120,000 + 44,700 = &minus;75,300 J = &minus;75.3 kJ. Since &Delta;G &lt; 0, the reaction is spontaneous.'
+    },
+    { type:'mcq',
+      q:'A reaction has &Delta;H &gt; 0 and &Delta;S &lt; 0. Under what temperature conditions, if any, will this reaction be spontaneous?',
+      choices:['Spontaneous at all temperatures','Spontaneous only at high temperatures','Spontaneous only at low temperatures','Never spontaneous at any temperature'],
+      correct:3,
+      explanation:'With &Delta;H &gt; 0 and &Delta;S &lt; 0, the term &minus;T&Delta;S is positive for every T &gt; 0. Adding a positive &Delta;H to a positive &minus;T&Delta;S term always gives &Delta;G &gt; 0, so this reaction can never be spontaneous at any temperature.'
+    },
+    { type:'mcq',
+      q:'A reaction has &Delta;H = +85.0 kJ and &Delta;S = +170. J/K. At what minimum temperature does the reaction become spontaneous?',
+      choices:['0.500 K','250 K','500 K','14,450 K'],
+      correct:2,
+      explanation:'At the crossover point, &Delta;G = 0, so T = &Delta;H/&Delta;S = 85,000 J / 170. J/K = 500 K. Since &Delta;S &gt; 0, the reaction becomes spontaneous above this temperature.'
+    },
+    { type:'mcq',
+      q:'Using standard Gibbs free energies of formation (&Delta;G<sub>f</sub>&deg;, kJ/mol): CO<sub>2</sub>(g) = &minus;394.4, H<sub>2</sub>O(g) = &minus;228.6, C<sub>3</sub>H<sub>8</sub>(g) = &minus;23.4, O<sub>2</sub>(g) = 0, calculate &Delta;G&deg;<sub>rxn</sub> for: C<sub>3</sub>H<sub>8</sub>(g) + 5O<sub>2</sub>(g) &rarr; 3CO<sub>2</sub>(g) + 4H<sub>2</sub>O(g).',
+      choices:['&minus;2121.0 kJ','&minus;2074.2 kJ','&minus;2050.8 kJ','+2074.2 kJ'],
+      correct:1,
+      explanation:'&Delta;G&deg;<sub>rxn</sub> = [3(&minus;394.4) + 4(&minus;228.6)] &minus; [(&minus;23.4) + 5(0)] = (&minus;1183.2 &minus; 914.4) &minus; (&minus;23.4) = &minus;2097.6 + 23.4 = &minus;2074.2 kJ.'
+    },
+    { type:'challenge',
+      q:'For 2NO<sub>2</sub>(g) &rarr; N<sub>2</sub>O<sub>4</sub>(g), &Delta;H&deg; = &minus;57.2 kJ and &Delta;S&deg; = &minus;175.8 J/K. (a) Calculate &Delta;G&deg; at 298 K and determine if the reaction is spontaneous under standard conditions. (b) Calculate the temperature above which the reaction becomes non-spontaneous.',
+      solution:`<ol>
+        <li>&Delta;G&deg; = &Delta;H&deg; &minus; T&Delta;S&deg; = &minus;57,200 &minus; (298)(&minus;175.8) = &minus;57,200 + 52,388.4 = &minus;4811.6 J &asymp; &minus;4.81 kJ</li>
+        <li>Since &Delta;G&deg; &lt; 0 at 298 K, the reaction is spontaneous under standard conditions</li>
+        <li>Crossover temperature: T = &Delta;H&deg;/&Delta;S&deg; = &minus;57,200 / &minus;175.8</li>
+      </ol>
+      <p class="final">&Delta;G&deg; (298 K) &asymp; &minus;4.81 kJ, spontaneous. Crossover T &asymp; 325 K &mdash; above this temperature, the &minus;T&Delta;S&deg; term becomes positive enough to make &Delta;G&deg; &gt; 0, so the reaction becomes non-spontaneous above about 325 K.</p>`
+    },
+    { type:'challenge',
+      q:'A reaction has &Delta;H&deg; = +45.0 kJ and &Delta;G&deg; = +12.6 kJ at 298 K. (a) Calculate &Delta;S&deg;. (b) Is the reaction spontaneous under standard conditions? (c) Will increasing temperature make the reaction more or less likely to be spontaneous? Justify your answer.',
+      solution:`<ol>
+        <li>&Delta;G&deg; = &Delta;H&deg; &minus; T&Delta;S&deg; &rArr; &Delta;S&deg; = (&Delta;H&deg; &minus; &Delta;G&deg;)/T = (45,000 &minus; 12,600)/298 = 32,400/298</li>
+      </ol>
+      <p class="final">(a) &Delta;S&deg; &asymp; +108.7 J/K. (b) &Delta;G&deg; = +12.6 kJ &gt; 0, so the reaction is <strong>not</strong> spontaneous under standard conditions. (c) Since &Delta;S&deg; is positive, increasing T makes the &minus;T&Delta;S&deg; term more negative, which will eventually pull &Delta;G below zero &mdash; so increasing temperature makes the reaction more likely to become spontaneous.</p>`
+    }
+  ]},
+  { id:'equilibrium', label:'Thermodynamics & Equilibrium', prefix:'K', questions:[
+    { type:'mcq',
+      q:'For a reaction with &Delta;G&deg; = &minus;11.4 kJ/mol at 298 K, calculate the equilibrium constant K using &Delta;G&deg; = &minus;RT ln K. (R = 8.314 J/mol&middot;K)',
+      choices:['0.0100','4.60','11,400','99.5'],
+      correct:3,
+      explanation:'ln K = &minus;&Delta;G&deg;/(RT) = 11,400 / [(8.314)(298)] = 11,400/2477.6 = 4.60. K = e<sup>4.60</sup> &asymp; 99.5. Forgetting to exponentiate, or exponentiating with the wrong sign, gives the other options.'
+    },
+    { type:'mcq',
+      q:'If a reaction has K &gt; 1 at a given temperature, what can be concluded about &Delta;G&deg; at that temperature?',
+      choices:['&Delta;G&deg; &gt; 0','&Delta;G&deg; = 0','&Delta;G&deg; &lt; 0','&Delta;G&deg; cannot be determined without more information'],
+      correct:2,
+      explanation:'Since &Delta;G&deg; = &minus;RT ln K, when K &gt; 1, ln K is positive, and the negative sign in front makes &Delta;G&deg; negative.'
+    },
+    { type:'mcq',
+      q:'Using &Delta;G = &Delta;G&deg; + RT ln Q, if Q &lt; K for a reaction not yet at equilibrium, what can be concluded?',
+      choices:['The reaction proceeds in the forward direction (toward products)','The reaction proceeds in the reverse direction (toward reactants)','The reaction is already at equilibrium','The reaction cannot be spontaneous in either direction'],
+      correct:0,
+      explanation:'&Delta;G can be rewritten as RT ln(Q/K). If Q &lt; K, then Q/K &lt; 1, so ln(Q/K) &lt; 0 and &Delta;G &lt; 0: the forward reaction is spontaneous, and the reaction proceeds toward products until Q rises to equal K.'
+    },
+    { type:'mcq',
+      q:'A reaction has an equilibrium constant K = 2.5 &times; 10<sup>&minus;3</sup> at 350 K. Calculate &Delta;G&deg; for the reaction at this temperature. (R = 8.314 J/mol&middot;K)',
+      choices:['&minus;17.4 kJ/mol','+2.91 kJ/mol','+17.4 kJ/mol','+0.0249 kJ/mol'],
+      correct:2,
+      explanation:'&Delta;G&deg; = &minus;RT ln K = &minus;(8.314)(350) ln(2.5&times;10<sup>&minus;3</sup>) = &minus;(2909.9)(&minus;5.99) &asymp; +17,400 J = +17.4 kJ/mol. A positive &Delta;G&deg; makes sense since K &lt; 1.'
+    },
+    { type:'challenge',
+      q:'For N<sub>2</sub>O<sub>4</sub>(g) &#8652; 2NO<sub>2</sub>(g), &Delta;H&deg; = +57.2 kJ and &Delta;S&deg; = +175.8 J/K. (a) Calculate &Delta;G&deg; at 298 K. (b) Using &Delta;G&deg; = &minus;RT ln K, calculate K at 298 K. (c) Predict whether K will increase or decrease as temperature increases, and justify using the sign of &Delta;H&deg;.',
+      solution:`<ol>
+        <li>&Delta;G&deg; = &Delta;H&deg; &minus; T&Delta;S&deg; = 57,200 &minus; (298)(175.8) = 57,200 &minus; 52,388.4 = 4811.6 J &asymp; 4.81 kJ</li>
+        <li>ln K = &minus;&Delta;G&deg;/(RT) = &minus;4811.6/[(8.314)(298)] = &minus;4811.6/2477.6 = &minus;1.94</li>
+        <li>K = e<sup>&minus;1.94</sup> &asymp; 0.144</li>
+      </ol>
+      <p class="final">&Delta;G&deg; &asymp; +4.81 kJ &middot; K &asymp; 0.144 at 298 K. (c) Since &Delta;H&deg; &gt; 0 (endothermic), Le Chatelier&rsquo;s principle predicts that raising the temperature shifts the equilibrium toward products, so K will <strong>increase</strong> as temperature increases.</p>`
+    },
+    { type:'challenge',
+      q:'For 2O<sub>3</sub>(g) &rarr; 3O<sub>2</sub>(g), &Delta;H&deg; = &minus;285 kJ and &Delta;S&deg; = +137 J/K at 298 K. (a) Calculate &Delta;G&deg; at 298 K. (b) Is the reaction spontaneous under standard conditions? (c) Without recalculating, will &Delta;G&deg; become more negative or less negative as temperature increases? Explain.',
+      solution:`<ol>
+        <li>&Delta;G&deg; = &Delta;H&deg; &minus; T&Delta;S&deg; = &minus;285,000 &minus; (298)(137) = &minus;285,000 &minus; 40,826 = &minus;325,826 J</li>
+      </ol>
+      <p class="final">(a) &Delta;G&deg; &asymp; &minus;326 kJ. (b) Since &Delta;G&deg; &lt; 0, yes, the reaction is spontaneous under standard conditions &mdash; and the magnitude is so large that K would be enormous, meaning the reaction essentially goes to completion. (c) Because &Delta;H&deg; &lt; 0 and &Delta;S&deg; &gt; 0, both terms in &Delta;G&deg; = &Delta;H&deg; &minus; T&Delta;S&deg; favor spontaneity, and the &minus;T&Delta;S&deg; term becomes more negative as T increases &mdash; so &Delta;G&deg; becomes even more negative (more spontaneous) at higher temperatures.</p>`
+    }
+  ]}
+];
+const state = {}; // key: "topicIndex-qIndex" -> boolean (currently correct)
+const attempts = {}; // key: "topicIndex-qIndex" -> number of wrong guesses so far
+let mcqTotal = 0;
+TOPICS.forEach(t => t.questions.forEach(q => { if(q.type==='mcq') mcqTotal++; }));
+document.getElementById('score-total').textContent = mcqTotal;
+
+function renderNav(){
+  const nav = document.getElementById('topic-nav');
+  nav.innerHTML = TOPICS.map((t,i) =>
+    `<button data-idx="${i}" class="${i===0?'active':''}">${t.prefix} &middot; ${t.label}</button>`
+  ).join('');
+  nav.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      nav.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.topic-section').forEach(s=>s.classList.remove('active'));
+      document.getElementById('section-'+btn.dataset.idx).classList.add('active');
+    });
+  });
+}
+
+function renderMain(){
+  const main = document.getElementById('main');
+  main.innerHTML = TOPICS.map((t,ti) => `
+    <section class="topic-section ${ti===0?'active':''}" id="section-${ti}">
+      <div class="topic-heading">
+        <span class="num mono">UNIT &middot; ${t.prefix}</span>
+        <h2>${t.label}</h2>
+      </div>
+      ${t.questions.map((q,qi)=> renderCard(q,ti,qi,t.prefix)).join('')}
+    </section>
+  `).join('');
+}
+
+function renderCard(q,ti,qi,prefix){
+  const tag = `${prefix}-${String(qi+1).padStart(2,'0')}`;
+  if(q.type==='mcq'){
+    return `
+    <div class="card" id="card-${ti}-${qi}">
+      <span class="tag mono">${tag}</span>
+      <p class="q-text">${q.q}</p>
+      <div class="choices">
+        ${q.choices.map((c,ci)=>`<button class="choice" data-ti="${ti}" data-qi="${qi}" data-ci="${ci}">${c}</button>`).join('')}
+      </div>
+      <div class="feedback" id="fb-${ti}-${qi}"></div>
+    </div>`;
+  } else {
+    return `
+    <div class="card challenge" id="card-${ti}-${qi}">
+      <span class="tag mono">${tag} &middot; challenge</span>
+      <p class="q-text">${q.q}</p>
+      <button class="reveal-btn" data-ti="${ti}" data-qi="${qi}">Reveal step-by-step solution</button>
+      <div class="solution" id="sol-${ti}-${qi}">${q.solution}</div>
+    </div>`;
+  }
+}
+
+function attachHandlers(){
+  document.querySelectorAll('.choice').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const ti = +btn.dataset.ti, qi = +btn.dataset.qi, ci = +btn.dataset.ci;
+      const q = TOPICS[ti].questions[qi];
+      const card = document.getElementById(`card-${ti}-${qi}`);
+      const fb = document.getElementById(`fb-${ti}-${qi}`);
+      const allChoices = card.querySelectorAll('.choice');
+      const key = ti+'-'+qi;
+
+      if(ci === q.correct){
+        allChoices.forEach(c=>c.disabled = true);
+        btn.classList.add('is-correct');
+        card.classList.add('correct'); card.classList.remove('incorrect');
+        fb.innerHTML = `<span class="label">Correct</span>${q.explanation}`;
+        fb.className = 'feedback show good';
+        if(!state[key]){ state[key] = true; updateGauge(); }
+      } else {
+        attempts[key] = (attempts[key] || 0) + 1;
+        btn.classList.add('is-incorrect');
+        btn.disabled = true; // that option is used up either way
+
+        if(attempts[key] < 2){
+          // first miss: no answer reveal, just prompt another try
+          fb.innerHTML = `<span class="label">Not quite</span>Give it one more try &mdash; think back through the setup before picking again.`;
+          fb.className = 'feedback show bad';
+        } else {
+          // second miss: reveal the correct answer and explanation
+          allChoices.forEach(c=>c.disabled = true);
+          allChoices[q.correct].classList.add('is-correct');
+          card.classList.add('incorrect'); card.classList.remove('correct');
+          fb.innerHTML = `<span class="label">Not quite</span>${q.explanation}`;
+          fb.className = 'feedback show bad';
+          state[key] = false;
+          updateGauge();
+        }
+      }
+    });
+  });
+  document.querySelectorAll('.reveal-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const ti = btn.dataset.ti, qi = btn.dataset.qi;
+      const sol = document.getElementById(`sol-${ti}-${qi}`);
+      const showing = sol.classList.toggle('show');
+      btn.textContent = showing ? 'Hide solution' : 'Reveal step-by-step solution';
+    });
+  });
+}
+
+function updateGauge(){
+  const correctCount = Object.values(state).filter(Boolean).length;
+  document.getElementById('score-num').textContent = correctCount;
+  const pct = mcqTotal ? correctCount / mcqTotal : 0;
+  const circumference = 188.5;
+  document.getElementById('gauge-fill').setAttribute('stroke-dashoffset', circumference - (circumference*pct));
+  const angle = -90 + (pct*180);
+  document.getElementById('needle').setAttribute('transform', `rotate(${angle} 75 78)`);
+}
+
+document.getElementById('reset-btn').addEventListener('click', ()=>{
+  Object.keys(state).forEach(k=>delete state[k]);
+  Object.keys(attempts).forEach(k=>delete attempts[k]);
+  renderMain();
+  attachHandlers();
+  updateGauge();
+  document.querySelectorAll('.reveal-btn').forEach(b=>b.textContent='Reveal step-by-step solution');
+});
+
+renderNav();
+renderMain();
+attachHandlers();
+updateGauge();
+</script>
+</body>
+</html>
