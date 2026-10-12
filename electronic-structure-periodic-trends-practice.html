@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Foundations Review — Electronic Structure & Periodic Trends</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #16241f;
+    --bg-alt: #1d2f28;
+    --card: #1b2b25;
+    --ink: #f1ede4;
+    --ink-dim: #a9b6ae;
+    --accent: #e8a93e;
+    --accent-dim: #8a6a2e;
+    --correct: #7fa687;
+    --correct-bg: rgba(127,166,135,0.14);
+    --incorrect: #c1554b;
+    --incorrect-bg: rgba(193,85,75,0.14);
+    --rule: rgba(241,237,228,0.16);
+    --grid: rgba(241,237,228,0.045);
+  }
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    background-color:var(--bg);
+    background-image:
+      repeating-linear-gradient(0deg, var(--grid) 0px, var(--grid) 1px, transparent 1px, transparent 28px),
+      repeating-linear-gradient(90deg, var(--grid) 0px, var(--grid) 1px, transparent 1px, transparent 28px);
+    color:var(--ink);
+    font-family:'Source Serif 4', Georgia, serif;
+    line-height:1.5;
+    min-height:100vh;
+  }
+  .mono{ font-family:'Space Mono', monospace; }
+  a{ color:inherit; }
+
+  /* ---------- Header ---------- */
+  header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:24px;
+    padding:32px clamp(16px,4vw,48px) 20px;
+    border-bottom:1px solid var(--rule);
+    flex-wrap:wrap;
+  }
+  .title-block .eyebrow{
+    font-family:'Space Mono', monospace;
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin:0 0 6px;
+  }
+  .title-block h1{
+    margin:0;
+    font-size:clamp(24px,3.4vw,34px);
+    font-weight:700;
+    letter-spacing:-0.01em;
+  }
+  .title-block p{
+    margin:6px 0 0;
+    color:var(--ink-dim);
+    font-size:15px;
+  }
+
+  /* ---------- Gauge (signature element) ---------- */
+  .gauge-wrap{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:2px;
+    min-width:150px;
+  }
+  .gauge-wrap svg{ width:150px; height:90px; overflow:visible; }
+  .gauge-readout{
+    font-family:'Space Mono', monospace;
+    font-size:13px;
+    color:var(--ink-dim);
+    letter-spacing:.04em;
+  }
+  .gauge-readout strong{ color:var(--ink); }
+  #needle{ transform-origin:75px 78px; transition: transform .5s cubic-bezier(.3,1.4,.4,1); }
+
+  /* ---------- Topic nav ---------- */
+  nav{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    padding:20px clamp(16px,4vw,48px);
+    position:sticky;
+    top:0;
+    background:linear-gradient(var(--bg) 85%, transparent);
+    z-index:10;
+  }
+  nav button{
+    font-family:'Space Mono', monospace;
+    font-size:12px;
+    letter-spacing:.03em;
+    color:var(--ink-dim);
+    background:transparent;
+    border:1px solid var(--rule);
+    border-radius:100px;
+    padding:8px 16px;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  nav button:hover{ border-color:var(--accent-dim); color:var(--ink); }
+  nav button.active{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#1b2b25;
+    font-weight:700;
+  }
+  nav button:focus-visible, button:focus-visible, .choice:focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:2px;
+  }
+
+  main{ padding:8px clamp(16px,4vw,48px) 80px; max-width:820px; margin:0 auto; }
+  .topic-section{ display:none; }
+  .topic-section.active{ display:block; animation:fade .25s ease; }
+  @keyframes fade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+
+  .topic-heading{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    margin:28px 0 18px;
+  }
+  .topic-heading .num{
+    font-family:'Space Mono', monospace;
+    color:var(--accent);
+    font-size:13px;
+  }
+  .topic-heading h2{ margin:0; font-size:20px; font-weight:700; }
+
+  /* ---------- Question cards ---------- */
+  .card{
+    background:var(--card);
+    border:1px solid var(--rule);
+    border-left:3px solid var(--accent-dim);
+    border-radius:4px;
+    padding:22px 24px;
+    margin-bottom:18px;
+    position:relative;
+  }
+  .card.correct{ border-left-color:var(--correct); }
+  .card.incorrect{ border-left-color:var(--incorrect); }
+  .tag{
+    position:absolute;
+    top:-10px;
+    left:20px;
+    background:var(--bg);
+    border:1px solid var(--rule);
+    font-family:'Space Mono', monospace;
+    font-size:11px;
+    letter-spacing:.06em;
+    color:var(--ink-dim);
+    padding:2px 8px;
+    border-radius:3px;
+  }
+  .card.challenge .tag{ color:var(--accent); border-color:var(--accent-dim); }
+  .q-text{ margin:6px 0 16px; font-size:16.5px; }
+  .q-text sub{ font-size:.7em; }
+
+  .choices{ display:flex; flex-direction:column; gap:8px; }
+  .choice{
+    text-align:left;
+    font-family:'Source Serif 4', serif;
+    font-size:15px;
+    background:transparent;
+    border:1px solid var(--rule);
+    border-radius:4px;
+    padding:10px 14px;
+    color:var(--ink);
+    cursor:pointer;
+    transition:all .12s ease;
+  }
+  .choice:hover:not(:disabled){ border-color:var(--accent); background:rgba(232,169,62,0.06); }
+  .choice:disabled{ cursor:default; }
+  .choice.is-correct{ border-color:var(--correct); background:var(--correct-bg); }
+  .choice.is-incorrect{ border-color:var(--incorrect); background:var(--incorrect-bg); }
+
+  .feedback{
+    margin-top:14px;
+    padding:12px 14px;
+    border-radius:4px;
+    font-size:14.5px;
+    display:none;
+  }
+  .feedback.show{ display:block; }
+  .feedback.good{ background:var(--correct-bg); border:1px solid var(--correct); }
+  .feedback.bad{ background:var(--incorrect-bg); border:1px solid var(--incorrect); }
+  .feedback .label{ font-family:'Space Mono', monospace; font-size:11px; letter-spacing:.06em; text-transform:uppercase; display:block; margin-bottom:4px; }
+  .feedback.good .label{ color:var(--correct); }
+  .feedback.bad .label{ color:var(--incorrect); }
+
+  .reveal-btn{
+    font-family:'Space Mono', monospace;
+    font-size:12.5px;
+    letter-spacing:.03em;
+    background:transparent;
+    border:1px solid var(--accent-dim);
+    color:var(--accent);
+    border-radius:4px;
+    padding:9px 16px;
+    cursor:pointer;
+  }
+  .reveal-btn:hover{ background:rgba(232,169,62,0.1); }
+  .solution{
+    display:none;
+    margin-top:16px;
+    padding:16px 18px;
+    background:rgba(232,169,62,0.06);
+    border:1px dashed var(--accent-dim);
+    border-radius:4px;
+    font-size:14.5px;
+  }
+  .solution.show{ display:block; }
+  .solution ol{ margin:6px 0 0; padding-left:20px; }
+  .solution li{ margin-bottom:6px; }
+  .solution .final{ font-family:'Space Mono', monospace; color:var(--accent); }
+
+  footer{
+    text-align:center;
+    padding:24px;
+    color:var(--ink-dim);
+    font-family:'Space Mono', monospace;
+    font-size:12px;
+    border-top:1px solid var(--rule);
+  }
+  footer button{
+    background:none; border:none; color:var(--ink-dim); text-decoration:underline;
+    cursor:pointer; font-family:'Space Mono', monospace; font-size:12px;
+  }
+  footer button:hover{ color:var(--accent); }
+
+  @media (max-width:560px){
+    header{ flex-direction:column; align-items:flex-start; }
+    .gauge-wrap{ align-self:center; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title-block">
+    <p class="eyebrow">AP Chemistry &middot; Test Review</p>
+    <h1>Electronic Structure &amp; Periodic Trends</h1>
+    <p>36 problems across 6 topics &mdash; 4 multiple-choice and 2 free-response per topic. Work each one on paper before checking &mdash; the gauge tracks live accuracy on the multiple-choice items.</p>
+  </div>
+  <div class="gauge-wrap">
+    <svg viewBox="0 0 150 90">
+      <path d="M 15 78 A 60 60 0 0 1 135 78" fill="none" stroke="rgba(241,237,228,0.14)" stroke-width="10" stroke-linecap="round"/>
+      <path id="gauge-fill" d="M 15 78 A 60 60 0 0 1 135 78" fill="none" stroke="var(--accent)" stroke-width="10" stroke-linecap="round" stroke-dasharray="188.5" stroke-dashoffset="188.5"/>
+      <g id="needle">
+        <line x1="75" y1="78" x2="75" y2="26" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="75" cy="78" r="5" fill="var(--ink)"/>
+      </g>
+    </svg>
+    <div class="gauge-readout"><strong id="score-num">0</strong> / <span id="score-total">18</span> correct</div>
+  </div>
+</header>
+
+<nav id="topic-nav"></nav>
+<main id="main"></main>
+
+<footer>
+  <button id="reset-btn">reset all progress</button>
+</footer>
+
+<script>
+const TOPICS = [
+  { id:'econfig', label:'Electron Configuration & Quantum Numbers', prefix:'E', questions:[
+    { type:'mcq',
+      q:'What is the complete, ground-state electron configuration of iron (Fe, Z = 26)?',
+      choices:['1s<sup>2</sup>2s<sup>2</sup>2p<sup>6</sup>3s<sup>2</sup>3p<sup>6</sup>4s<sup>2</sup>3d<sup>4</sup>','1s<sup>2</sup>2s<sup>2</sup>2p<sup>6</sup>3s<sup>2</sup>3p<sup>6</sup>3d<sup>8</sup>','1s<sup>2</sup>2s<sup>2</sup>2p<sup>6</sup>3s<sup>2</sup>3p<sup>6</sup>4s<sup>2</sup>3d<sup>6</sup>','1s<sup>2</sup>2s<sup>2</sup>2p<sup>6</sup>3s<sup>2</sup>3p<sup>6</sup>4s<sup>1</sup>3d<sup>7</sup>'],
+      correct:2,
+      explanation:'Counting electrons: 2+2+6+2+6+2+6 = 26. The 4s subshell fills before 3d, and iron is NOT one of the exceptions (unlike Cr or Cu), so it follows the standard filling order: 1s&sup2;2s&sup2;2p&sup2;3s&sup2;3p&sup2;4s&sup2;3d&sup2; &mdash; written out, 1s<sup>2</sup>2s<sup>2</sup>2p<sup>6</sup>3s<sup>2</sup>3p<sup>6</sup>4s<sup>2</sup>3d<sup>6</sup>.'
+    },
+    { type:'mcq',
+      q:'Which set of quantum numbers (n, l, m<sub>l</sub>, m<sub>s</sub>) is NOT allowed for an electron in an atom?',
+      choices:['n=3, l=2, m<sub>l</sub>=&minus;2, m<sub>s</sub>=+&frac12;','n=2, l=2, m<sub>l</sub>=0, m<sub>s</sub>=&minus;&frac12;','n=4, l=0, m<sub>l</sub>=0, m<sub>s</sub>=+&frac12;','n=3, l=1, m<sub>l</sub>=+1, m<sub>s</sub>=&minus;&frac12;'],
+      correct:1,
+      explanation:'The angular momentum quantum number l can only range from 0 to n&minus;1. For n=2, the maximum allowed value of l is 1 (giving the 2s and 2p subshells), so l=2 is impossible for n=2. The other three sets all satisfy l &le; n&minus;1 and are valid.'
+    },
+    { type:'mcq',
+      q:'Which electron configuration represents an EXCITED state rather than a ground state?',
+      choices:['1s<sup>2</sup>2s<sup>2</sup>2p<sup>6</sup>3s<sup>2</sup>3p<sup>4</sup>','1s<sup>2</sup>2s<sup>2</sup>2p<sup>6</sup>3s<sup>1</sup>3p<sup>5</sup>','1s<sup>2</sup>2s<sup>2</sup>2p<sup>6</sup>3s<sup>2</sup>3p<sup>6</sup>4s<sup>2</sup>','[Ar]4s<sup>2</sup>3d<sup>10</sup>4p<sup>6</sup>'],
+      correct:1,
+      explanation:'This configuration has 16 electrons (sulfur), but its ground state should fill 3s completely before placing electrons in 3p: 1s<sup>2</sup>2s<sup>2</sup>2p<sup>6</sup>3s<sup>2</sup>3p<sup>4</sup>. Having only one electron in 3s while 3p already has five means an electron has been promoted out of the lower-energy 3s orbital &mdash; an excited state. The other three configurations are all valid ground states (S, Ca, and Kr respectively).'
+    },
+    { type:'mcq',
+      q:'An atom has the electron configuration 1s<sup>2</sup>2s<sup>2</sup>2p<sup>6</sup>3s<sup>2</sup>3p<sup>6</sup>4s<sup>2</sup>3d<sup>10</sup>4p<sup>3</sup>. How many valence electrons does it have, and what element is it?',
+      choices:['5 valence electrons; Arsenic (As)','15 valence electrons; Arsenic (As)','5 valence electrons; Phosphorus (P)','13 valence electrons; Germanium (Ge)'],
+      correct:0,
+      explanation:'Total electrons = 2+2+6+2+6+2+10+3 = 33, so Z = 33, Arsenic (As). For a p-block element, the valence electrons are those in the highest-numbered ns and np subshells (the filled, inner 3d<sup>10</sup> is not counted as valence) &mdash; here that&rsquo;s 4s<sup>2</sup>4p<sup>3</sup>, or 5 valence electrons.'
+    },
+    { type:'challenge',
+      q:'Write the complete ground-state electron configuration for chromium (Cr, Z = 24), noting that Cr is an exception to the normal filling order. Explain why this exception occurs, and state the number of unpaired electrons in the ground-state atom.',
+      solution:`<ol>
+        <li>Expected (but incorrect) configuration by normal filling order: 1s<sup>2</sup>2s<sup>2</sup>2p<sup>6</sup>3s<sup>2</sup>3p<sup>6</sup>4s<sup>2</sup>3d<sup>4</sup></li>
+        <li>Actual ground-state configuration: 1s<sup>2</sup>2s<sup>2</sup>2p<sup>6</sup>3s<sup>2</sup>3p<sup>6</sup>4s<sup>1</sup>3d<sup>5</sup></li>
+        <li>An electron shifts from 4s into 3d so that the 3d subshell becomes exactly half-filled (one electron in each of the five d orbitals). This symmetric, half-filled arrangement has lower electron-electron repulsion and more favorable exchange energy than a 4s<sup>2</sup>3d<sup>4</sup> arrangement, making it the lower-energy (more stable) configuration.</li>
+        <li>Unpaired electrons: the single 4s<sup>1</sup> electron (1 unpaired) plus all five 3d electrons, each alone in its own orbital (5 unpaired)</li>
+      </ol>
+      <p class="final">Ground state: 1s<sup>2</sup>2s<sup>2</sup>2p<sup>6</sup>3s<sup>2</sup>3p<sup>6</sup>4s<sup>1</sup>3d<sup>5</sup> &middot; 6 unpaired electrons total</p>`
+    },
+    { type:'challenge',
+      q:'An unknown ground-state atom has the configuration [Kr]5s<sup>2</sup>4d<sup>10</sup>5p<sup>1</sup>. (a) Identify the element. (b) Write the full, uncondensed electron configuration. (c) Determine the number of valence electrons, and state whether this element is most likely a metal, metalloid, or nonmetal, briefly justifying your answer.',
+      solution:`<ol>
+        <li>[Kr] represents 36 electrons. Adding 5s<sup>2</sup>4d<sup>10</sup>5p<sup>1</sup> (2+10+1 = 13 more) gives a total of 36+13 = 49 electrons, so Z = 49: Indium (In)</li>
+        <li>Full configuration: 1s<sup>2</sup>2s<sup>2</sup>2p<sup>6</sup>3s<sup>2</sup>3p<sup>6</sup>4s<sup>2</sup>3d<sup>10</sup>4p<sup>6</sup>5s<sup>2</sup>4d<sup>10</sup>5p<sup>1</sup></li>
+        <li>Valence electrons (ns and np only, not the filled inner 4d<sup>10</sup>): 5s<sup>2</sup>5p<sup>1</sup> = 3 valence electrons</li>
+      </ol>
+      <p class="final">Element: Indium (In) &middot; 3 valence electrons &middot; Classification: a metal &mdash; indium sits in Group 13, and with only 3 loosely-held outer electrons and a large atomic radius (period 5), it readily loses electrons, consistent with metallic behavior.</p>`
+    }
+  ]},
+  { id:'radius', label:'Atomic & Ionic Radius', prefix:'R', questions:[
+    { type:'mcq',
+      q:'Which correctly ranks these period-3 elements in order of INCREASING atomic radius: Na, Mg, Al, Si?',
+      choices:['Na &lt; Mg &lt; Al &lt; Si','Si &lt; Al &lt; Mg &lt; Na','Mg &lt; Na &lt; Si &lt; Al','Al &lt; Si &lt; Na &lt; Mg'],
+      correct:1,
+      explanation:'Moving left to right across a period, atomic radius decreases as effective nuclear charge increases while electrons are added to the same shell (poor shielding from each other). So the increasing-radius order is the reverse of left-to-right position: Si &lt; Al &lt; Mg &lt; Na.'
+    },
+    { type:'mcq',
+      q:'O<sup>2&minus;</sup>, F<sup>&minus;</sup>, Na<sup>+</sup>, and Mg<sup>2+</sup> are all isoelectronic (10 electrons each, same as Ne). Which correctly ranks them in order of INCREASING radius?',
+      choices:['O<sup>2&minus;</sup> &lt; F<sup>&minus;</sup> &lt; Na<sup>+</sup> &lt; Mg<sup>2+</sup>','Mg<sup>2+</sup> &lt; Na<sup>+</sup> &lt; F<sup>&minus;</sup> &lt; O<sup>2&minus;</sup>','Na<sup>+</sup> &lt; Mg<sup>2+</sup> &lt; O<sup>2&minus;</sup> &lt; F<sup>&minus;</sup>','F<sup>&minus;</sup> &lt; O<sup>2&minus;</sup> &lt; Mg<sup>2+</sup> &lt; Na<sup>+</sup>'],
+      correct:1,
+      explanation:'With the same number of electrons (10) in every species, radius is determined entirely by nuclear charge: more protons pull the same electron cloud in more tightly. Proton counts are O (8) &lt; F (9) &lt; Na (11) &lt; Mg (12), so radius decreases in that same order &mdash; meaning the increasing-radius order is Mg<sup>2+</sup> &lt; Na<sup>+</sup> &lt; F<sup>&minus;</sup> &lt; O<sup>2&minus;</sup>.'
+    },
+    { type:'mcq',
+      q:'Which best explains why a cation (e.g., Na<sup>+</sup>) is smaller than its parent atom (Na)?',
+      choices:['Removing an electron decreases electron-electron repulsion while the same nuclear charge pulls the remaining electrons in more tightly, and often removes an entire occupied shell','The nucleus itself becomes physically smaller when an atom loses an electron','Cations have more neutrons than their parent atoms, pulling electrons in more tightly','Removing an electron increases the number of occupied energy levels, spreading electrons farther out'],
+      correct:0,
+      explanation:'Losing an electron (especially the single valence electron of Na, leaving a Ne-like core with one fewer occupied shell) reduces electron-electron repulsion and leaves the same nuclear charge to act on fewer, more tightly held electrons &mdash; shrinking the ion relative to the neutral atom.'
+    },
+    { type:'mcq',
+      q:'Which best explains why an anion (e.g., Cl<sup>&minus;</sup>) is larger than its parent atom (Cl)?',
+      choices:['Adding an electron increases electron-electron repulsion while the nuclear charge stays the same, causing the electron cloud to expand','Adding an electron adds a proton to the nucleus, increasing the overall size','Anions have fewer occupied energy levels than their parent atoms','The added electron increases the effective nuclear charge felt by all the electrons'],
+      correct:0,
+      explanation:'Gaining an electron adds more electron-electron repulsion without any change in nuclear charge, so the existing electron cloud spreads out to minimize that repulsion &mdash; making the anion larger than the neutral atom.'
+    },
+    { type:'challenge',
+      q:'Rank S<sup>2&minus;</sup>, Cl<sup>&minus;</sup>, and K<sup>+</sup> in order of increasing radius, and explain your reasoning. (All three are isoelectronic with Ar &mdash; 18 electrons each.)',
+      solution:`<ol>
+        <li>Proton counts: S (16), Cl (17), K (19)</li>
+        <li>All three ions have exactly 18 electrons with identical shielding, so the only difference between them is nuclear charge</li>
+        <li>More protons pulling on the same 18 electrons means a smaller radius; fewer protons means a larger radius</li>
+      </ol>
+      <p class="final">Increasing radius: K<sup>+</sup> &lt; Cl<sup>&minus;</sup> &lt; S<sup>2&minus;</sup>. S<sup>2&minus;</sup> has the fewest protons (16) holding onto the 18 electrons, so its electron cloud is held least tightly and it is largest; K<sup>+</sup> has the most protons (19) pulling on the same 18 electrons, holding them most tightly and making it smallest.</p>`
+    },
+    { type:'challenge',
+      q:'Explain, with reference to effective nuclear charge and electron shielding, why atomic radius INCREASES down a group but DECREASES across a period. Use lithium vs. sodium (down a group) and lithium vs. fluorine (across period 2) as your specific examples.',
+      solution:`<p><strong>Down a group (Li &rarr; Na):</strong> each successive element adds an entirely new principal energy level. Although nuclear charge increases, the added inner shells of electrons shield the valence electron from that extra nuclear charge quite effectively. The dominant effect is that Na&rsquo;s valence electron occupies the n=3 shell, farther from the nucleus than Li&rsquo;s n=2 valence electron &mdash; so radius increases down the group.</p>
+      <p><strong>Across a period (Li &rarr; F):</strong> electrons are added to the same principal energy level (n=2 for both) while protons are also added to the nucleus. Electrons within the same shell shield each other from the nucleus very poorly, so effective nuclear charge rises substantially across the period. This pulls the entire n=2 electron cloud in tighter, so F is considerably smaller than Li even though both have valence electrons in the same shell.</p>
+      <p class="final">Down a group: shielding from new inner shells dominates &rarr; radius increases. Across a period: poor same-shell shielding lets effective nuclear charge dominate &rarr; radius decreases.</p>`
+    }
+  ]},
+  { id:'ioniz', label:'Ionization Energy', prefix:'I', questions:[
+    { type:'mcq',
+      q:'Which correctly ranks these elements in order of INCREASING first ionization energy: K, Ca, Rb, Sr?',
+      choices:['Rb &lt; K &lt; Sr &lt; Ca','K &lt; Rb &lt; Ca &lt; Sr','Ca &lt; Sr &lt; K &lt; Rb','Rb &lt; Sr &lt; K &lt; Ca'],
+      correct:0,
+      explanation:'Ionization energy decreases down a group and increases across a period. Within Group 1, Rb (period 5) &lt; K (period 4); within Group 2, Sr (period 5) &lt; Ca (period 4). Comparing across groups within the same period, Group 2 generally has a higher IE than Group 1. Putting it together: Rb &lt; K &lt; Sr &lt; Ca.'
+    },
+    { type:'mcq',
+      q:'Which best explains why ionization energy generally INCREASES across a period from left to right?',
+      choices:['Effective nuclear charge increases across a period as protons are added while same-shell shielding stays roughly constant, pulling valence electrons in more tightly and requiring more energy to remove them','Atoms gain additional electron shells moving across a period, increasing the distance between the nucleus and valence electrons','The number of core electrons increases dramatically across a period, increasing shielding','Valence electrons become less attracted to the nucleus as atomic mass increases across a period'],
+      correct:0,
+      explanation:'Across a period, electrons are added to the same shell (poor mutual shielding) while protons increase, so effective nuclear charge rises steadily. A valence electron held more tightly by a higher effective nuclear charge requires more energy to remove.'
+    },
+    { type:'mcq',
+      q:'Which correctly explains why the first ionization energy of boron (B) is LOWER than that of beryllium (Be), despite boron having a greater nuclear charge?',
+      choices:['The electron removed from boron comes from the higher-energy 2p subshell, which is less tightly bound than the filled, lower-energy 2s subshell in beryllium','Boron has fewer total electrons than beryllium','Beryllium&rsquo;s nucleus is more shielded by inner electrons than boron&rsquo;s nucleus','Boron has a larger atomic radius, which always correlates with lower ionization energy regardless of subshell'],
+      correct:0,
+      explanation:'Be is [He]2s<sup>2</sup> &mdash; a filled, especially stable subshell. B is [He]2s<sup>2</sup>2p<sup>1</sup> &mdash; its outermost electron is in the higher-energy, more poorly-shielded 2p subshell. Even though B has one more proton, its 2p electron is easier to remove than one of Be&rsquo;s tightly-held 2s electrons.'
+    },
+    { type:'mcq',
+      q:'Which correctly explains why the first ionization energy of oxygen (O) is LOWER than that of nitrogen (N), despite oxygen having a greater nuclear charge?',
+      choices:['Oxygen&rsquo;s 2p<sup>4</sup> configuration has one doubly-occupied p orbital, and the extra electron-electron repulsion there makes one electron easier to remove than from nitrogen&rsquo;s symmetric, half-filled 2p<sup>3</sup> arrangement','Oxygen has a smaller atomic radius than nitrogen, so its valence electrons require less energy to remove','Nitrogen&rsquo;s highest-energy electrons are in the 2s subshell, which is harder to remove than oxygen&rsquo;s 2p electrons','Oxygen&rsquo;s additional electron occupies a new, higher-energy shell farther from the nucleus'],
+      correct:0,
+      explanation:'N is [He]2s<sup>2</sup>2p<sup>3</sup> &mdash; a half-filled 2p subshell with one electron in each orbital, an especially stable, low-repulsion arrangement. O is [He]2s<sup>2</sup>2p<sup>4</sup>, forcing two electrons into one 2p orbital. The repulsion between that paired set makes one of oxygen&rsquo;s electrons easier to remove than any of nitrogen&rsquo;s unpaired electrons.'
+    },
+    { type:'challenge',
+      q:'The successive ionization energies (MJ/mol) for an unknown representative element are: IE<sub>1</sub> = 0.58, IE<sub>2</sub> = 1.82, IE<sub>3</sub> = 2.75, IE<sub>4</sub> = 11.60, IE<sub>5</sub> = 14.84. (a) Based on this pattern, how many valence electrons does this element have, and which group does it most likely belong to? (b) Explain, in terms of electron shells, why there is such a large jump between IE<sub>3</sub> and IE<sub>4</sub>.',
+      solution:`<ol>
+        <li>Compare consecutive ratios: IE<sub>2</sub>/IE<sub>1</sub> &asymp; 3.1, IE<sub>3</sub>/IE<sub>2</sub> &asymp; 1.5, but IE<sub>4</sub>/IE<sub>3</sub> &asymp; 4.2 &mdash; a dramatically larger jump than the others</li>
+        <li>This huge jump between IE<sub>3</sub> and IE<sub>4</sub> means the first 3 electrons removed were valence electrons, and the 4th electron came from a full, lower (core) shell</li>
+      </ol>
+      <p class="final">(a) 3 valence electrons &rarr; most likely Group 13 (these values closely match aluminum). (b) After the 3 valence electrons are removed, the next electron must come from a complete inner shell much closer to the nucleus and no longer shielded by the departed valence electrons &mdash; requiring far more energy to overcome the much stronger nuclear attraction.</p>`
+    },
+    { type:'challenge',
+      q:'For magnesium, the first four ionization energies (MJ/mol) are: IE<sub>1</sub> = 0.74, IE<sub>2</sub> = 1.45, IE<sub>3</sub> = 7.73, IE<sub>4</sub> = 10.54. (a) Explain the large jump between IE<sub>2</sub> and IE<sub>3</sub>, referencing Mg&rsquo;s electron configuration. (b) Compare Mg&rsquo;s IE<sub>1</sub> to Al&rsquo;s IE<sub>1</sub> (0.58 MJ/mol) and explain why Mg&rsquo;s first ionization energy is HIGHER than Al&rsquo;s, despite Al having a greater nuclear charge.',
+      solution:`<p>(a) Mg is [Ne]3s<sup>2</sup>, with 2 valence electrons. Removing the first two electrons empties the 3s subshell entirely. The third electron removed must come from the full, stable 2p<sup>6</sup> (Ne) core &mdash; held much more tightly, much closer to the nucleus, and no longer shielded by the departed valence electrons. This is why IE<sub>3</sub> jumps so dramatically above IE<sub>2</sub>.</p>
+      <p>(b) This is the same type of exception seen between Be and B: although Al has one more proton than Mg, Al&rsquo;s valence electron being removed comes from the higher-energy, more-shielded 3p subshell, while Mg&rsquo;s electron comes from the lower-energy, filled 3s<sup>2</sup> subshell. The extra stability of Mg&rsquo;s filled 3s<sup>2</sup> subshell makes its first ionization energy higher than Al&rsquo;s, despite Al&rsquo;s greater nuclear charge.</p>
+      <p class="final">(a) The jump reflects breaking into the stable, inner Ne core after the 2 valence electrons are gone. (b) Mg&rsquo;s filled 3s<sup>2</sup> subshell is more stable than Al&rsquo;s 3s<sup>2</sup>3p<sup>1</sup>, so Mg holds its first electron more tightly despite Al&rsquo;s larger nuclear charge.</p>`
+    }
+  ]},
+  { id:'metallic', label:'Metallic Character', prefix:'M', questions:[
+    { type:'mcq',
+      q:'Which correctly ranks these period-3 elements in order of INCREASING metallic character: Mg, Al, Na, Si?',
+      choices:['Si &lt; Al &lt; Mg &lt; Na','Na &lt; Mg &lt; Al &lt; Si','Mg &lt; Na &lt; Si &lt; Al','Al &lt; Mg &lt; Na &lt; Si'],
+      correct:0,
+      explanation:'Metallic character decreases left to right across a period (the opposite direction from ionization energy). So from most metallic to least metallic: Na &gt; Mg &gt; Al &gt; Si, meaning the increasing order is Si &lt; Al &lt; Mg &lt; Na.'
+    },
+    { type:'mcq',
+      q:'Which best explains why metallic character INCREASES down a group?',
+      choices:['Atomic radius increases down a group, so valence electrons are farther from the nucleus and more shielded, making them easier to lose &mdash; a hallmark of metallic behavior','Ionization energy increases down a group, making it easier for atoms to lose electrons','Electronegativity increases down a group, so atoms attract electrons from other atoms more strongly','Nuclear charge decreases down a group, reducing the number of electrons an atom can lose'],
+      correct:0,
+      explanation:'Down a group, added inner shells shield the valence electrons and increase atomic radius, so the valence electrons are held more loosely and lost more easily &mdash; the defining trait of metallic behavior.'
+    },
+    { type:'mcq',
+      q:'Which of these elements would be expected to show the MOST metallic character?',
+      choices:['Fluorine (F)','Carbon (C)','Potassium (K)','Sulfur (S)'],
+      correct:2,
+      explanation:'Potassium sits far to the left of the periodic table (Group 1) with a low ionization energy and large atomic radius, so it loses its single valence electron extremely easily &mdash; the clearest sign of metallic behavior among these four.'
+    },
+    { type:'mcq',
+      q:'Metallic character and ionization energy are generally _____ related across the periodic table.',
+      choices:['directly (both increase together across a period and down a group)','inversely (as ionization energy increases, metallic character tends to decrease, and vice versa)','unrelated; there is no consistent relationship between the two properties','directly related down a group, but unrelated across a period'],
+      correct:1,
+      explanation:'Elements with low ionization energy lose electrons easily &mdash; the defining feature of a metal &mdash; so low IE corresponds to high metallic character. Since IE increases across a period and decreases down a group, metallic character runs in exactly the opposite direction.'
+    },
+    { type:'challenge',
+      q:'Arrange K, Ca, Ga, and Ge (all period 4) in order of INCREASING metallic character, and justify your ranking using periodic trends.',
+      solution:`<ol>
+        <li>All four are in period 4, so compare their left-to-right positions: K (Group 1), Ca (Group 2), Ga (Group 13), Ge (Group 14)</li>
+        <li>Moving left to right, effective nuclear charge increases and atomic radius decreases, making valence electrons progressively harder to remove</li>
+      </ol>
+      <p class="final">Increasing metallic character: Ge &lt; Ga &lt; Ca &lt; K. K has the lowest effective nuclear charge on its single valence electron and the largest radius, so it loses that electron most easily (most metallic). Germanium, farthest right of the four and classified as a metalloid, holds its valence electrons most tightly and shows the least metallic behavior.</p>`
+    },
+    { type:'challenge',
+      q:'Explain why cesium (Cs) is considered one of the most metallic elements on the periodic table, while fluorine (F) is considered one of the least metallic. Address both atomic radius and ionization energy in your explanation, and state generally where metallic character is highest and lowest on the periodic table.',
+      solution:`<p>Cesium sits in Group 1, Period 6 &mdash; far to the left and near the bottom of the periodic table. Its large atomic radius and very low ionization energy (a single valence electron, far from the nucleus and heavily shielded by many inner shells) mean it loses that outer electron extremely easily, the defining trait of a metal.</p>
+      <p>Fluorine sits in Group 17, Period 2 &mdash; far to the right and near the top. Its small atomic radius and very high ionization energy (high effective nuclear charge with minimal shielding) mean it holds onto its electrons tightly and even attracts additional electrons rather than losing them &mdash; the hallmark of nonmetallic behavior.</p>
+      <p class="final">Metallic character is generally highest toward the bottom-left of the periodic table and lowest toward the upper-right (among reactive elements).</p>`
+    }
+  ]},
+  { id:'wave', label:'Light as a Wave', prefix:'W', questions:[
+    { type:'mcq',
+      q:'A beam of light has a wavelength of 450. nm. Calculate its frequency. (c = 2.998 &times; 10<sup>8</sup> m/s)',
+      choices:['1.50 &times; 10<sup>&minus;15</sup> Hz','6.66 &times; 10<sup>5</sup> Hz','6.66 &times; 10<sup>14</sup> Hz','6.66 &times; 10<sup>13</sup> Hz'],
+      correct:2,
+      explanation:'&nu; = c/&lambda; = (2.998&times;10<sup>8</sup> m/s) / (450.&times;10<sup>&minus;9</sup> m) = 6.66&times;10<sup>14</sup> Hz. The distractors come from forgetting to convert nm to m, inverting the ratio, or misplacing a power of ten.'
+    },
+    { type:'mcq',
+      q:'Calculate the energy of a single photon with frequency 5.00 &times; 10<sup>14</sup> Hz. (h = 6.626 &times; 10<sup>&minus;34</sup> J&middot;s)',
+      choices:['1.33 &times; 10<sup>&minus;48</sup> J','1.33 &times; 10<sup>&minus;19</sup> J','3.31 &times; 10<sup>&minus;19</sup> J','7.55 &times; 10<sup>47</sup> J'],
+      correct:2,
+      explanation:'E = h&nu; = (6.626&times;10<sup>&minus;34</sup>)(5.00&times;10<sup>14</sup>) = 3.31&times;10<sup>&minus;19</sup> J. The other values come from dividing instead of multiplying, or misplacing a decimal.'
+    },
+    { type:'mcq',
+      q:'What is the wavelength (in nm) of a photon with energy 4.50 &times; 10<sup>&minus;19</sup> J? (h = 6.626 &times; 10<sup>&minus;34</sup> J&middot;s, c = 2.998 &times; 10<sup>8</sup> m/s)',
+      choices:['1.33 &times; 10<sup>&minus;15</sup> nm','4.42 nm','442 nm','2.26 &times; 10<sup>6</sup> nm'],
+      correct:2,
+      explanation:'&lambda; = hc/E = [(6.626&times;10<sup>&minus;34</sup>)(2.998&times;10<sup>8</sup>)] / (4.50&times;10<sup>&minus;19</sup>) = 4.42&times;10<sup>&minus;7</sup> m = 442 nm.'
+    },
+    { type:'mcq',
+      q:'Rank the following types of electromagnetic radiation in order of INCREASING energy per photon: radio waves, visible light, X-rays, infrared light.',
+      choices:['Radio waves &lt; infrared &lt; visible &lt; X-rays','X-rays &lt; visible &lt; infrared &lt; radio waves','Visible &lt; radio waves &lt; X-rays &lt; infrared','Infrared &lt; radio waves &lt; X-rays &lt; visible'],
+      correct:0,
+      explanation:'Photon energy increases as wavelength decreases (and frequency increases). Across the electromagnetic spectrum, this order (lowest to highest energy) is radio waves &lt; infrared &lt; visible light &lt; X-rays.'
+    },
+    { type:'challenge',
+      q:'A He-Ne laser emits light with a wavelength of 632.8 nm. (a) Calculate the frequency of this light. (b) Calculate the energy of one photon. (c) Calculate the energy of one mole of these photons, in kJ/mol. (h = 6.626&times;10<sup>&minus;34</sup> J&middot;s, c = 2.998&times;10<sup>8</sup> m/s, N<sub>A</sub> = 6.022&times;10<sup>23</sup>/mol)',
+      solution:`<ol>
+        <li>&nu; = c/&lambda; = (2.998&times;10<sup>8</sup>)/(632.8&times;10<sup>&minus;9</sup>) = 4.74&times;10<sup>14</sup> Hz</li>
+        <li>E = h&nu; = (6.626&times;10<sup>&minus;34</sup>)(4.74&times;10<sup>14</sup>) = 3.14&times;10<sup>&minus;19</sup> J</li>
+        <li>E<sub>mol</sub> = (3.14&times;10<sup>&minus;19</sup>)(6.022&times;10<sup>23</sup>) = 1.89&times;10<sup>5</sup> J/mol</li>
+      </ol>
+      <p class="final">&nu; &asymp; 4.74&times;10<sup>14</sup> Hz &middot; E<sub>photon</sub> &asymp; 3.14&times;10<sup>&minus;19</sup> J &middot; E<sub>mol</sub> &asymp; 189 kJ/mol</p>`
+    },
+    { type:'challenge',
+      q:'A hydrogen atom emits a photon with wavelength 486.1 nm (part of the Balmer series). (a) Calculate the frequency of this photon. (b) Calculate its energy in joules. (c) Convert this to kJ/mol, representing the energy released per mole of photons at this wavelength.',
+      solution:`<ol>
+        <li>&nu; = c/&lambda; = (2.998&times;10<sup>8</sup>)/(486.1&times;10<sup>&minus;9</sup>) = 6.17&times;10<sup>14</sup> Hz</li>
+        <li>E = h&nu; = (6.626&times;10<sup>&minus;34</sup>)(6.17&times;10<sup>14</sup>) = 4.09&times;10<sup>&minus;19</sup> J</li>
+        <li>E<sub>mol</sub> = (4.09&times;10<sup>&minus;19</sup>)(6.022&times;10<sup>23</sup>) = 2.46&times;10<sup>5</sup> J/mol</li>
+      </ol>
+      <p class="final">&nu; &asymp; 6.17&times;10<sup>14</sup> Hz &middot; E<sub>photon</sub> &asymp; 4.09&times;10<sup>&minus;19</sup> J &middot; E<sub>mol</sub> &asymp; 246 kJ/mol</p>`
+    }
+  ]},
+  { id:'particle', label:'Light as a Particle & de Broglie', prefix:'P', questions:[
+    { type:'mcq',
+      q:'According to Einstein&rsquo;s explanation of the photoelectric effect, light behaves as discrete packets of energy called _____, with energy given by E = h&nu;.',
+      choices:['electrons','photons','neutrons','quanta of mass'],
+      correct:1,
+      explanation:'Einstein proposed that light consists of discrete energy packets called photons, each carrying energy E = h&nu;. This explains why ejecting electrons from a metal surface depends on the frequency of the incident light, not merely its intensity.'
+    },
+    { type:'mcq',
+      q:'The work function of a metal is 3.20 &times; 10<sup>&minus;19</sup> J. What is the minimum frequency of light required to eject an electron from this metal via the photoelectric effect? (h = 6.626&times;10<sup>&minus;34</sup> J&middot;s)',
+      choices:['2.12 &times; 10<sup>&minus;48</sup> Hz','4.83 &times; 10<sup>13</sup> Hz','4.83 &times; 10<sup>14</sup> Hz','2.07 &times; 10<sup>15</sup> Hz'],
+      correct:2,
+      explanation:'&nu;<sub>min</sub> = (work function)/h = (3.20&times;10<sup>&minus;19</sup>)/(6.626&times;10<sup>&minus;34</sup>) = 4.83&times;10<sup>14</sup> Hz.'
+    },
+    { type:'mcq',
+      q:'Calculate the de Broglie wavelength of an electron (mass = 9.11 &times; 10<sup>&minus;31</sup> kg) moving at 2.00 &times; 10<sup>6</sup> m/s. (h = 6.626 &times; 10<sup>&minus;34</sup> J&middot;s)',
+      choices:['1.66 &times; 10<sup>&minus;57</sup> m','3.64 &times; 10<sup>&minus;13</sup> m','3.64 &times; 10<sup>&minus;10</sup> m','2.75 &times; 10<sup>9</sup> m'],
+      correct:2,
+      explanation:'&lambda; = h/(mv) = (6.626&times;10<sup>&minus;34</sup>) / [(9.11&times;10<sup>&minus;31</sup>)(2.00&times;10<sup>6</sup>)] = 3.64&times;10<sup>&minus;10</sup> m.'
+    },
+    { type:'mcq',
+      q:'Which best explains why a thrown baseball does not show observable wave-like (diffraction) behavior, even though de Broglie&rsquo;s equation technically assigns it a wavelength?',
+      choices:['The baseball&rsquo;s mass is so large that its calculated de Broglie wavelength is astronomically small &mdash; far too small to produce any observable diffraction or interference','Baseballs are not charged particles, so de Broglie&rsquo;s equation does not apply to them at all','De Broglie&rsquo;s equation only applies to electrons, not to any other object','The baseball is moving too slowly for the equation to give a nonzero wavelength'],
+      correct:0,
+      explanation:'Because &lambda; = h/(mv) and h is so tiny, any object with everyday (macroscopic) mass has a de Broglie wavelength far smaller than anything that could ever be observed experimentally &mdash; which is why wave behavior matters for electrons but not baseballs.'
+    },
+    { type:'challenge',
+      q:'Calculate the de Broglie wavelength of a proton (mass = 1.673 &times; 10<sup>&minus;27</sup> kg) traveling at 1.50 &times; 10<sup>5</sup> m/s. Then, without recalculating, explain how this proton&rsquo;s de Broglie wavelength compares to that of an electron traveling at the same speed.',
+      solution:`<ol>
+        <li>&lambda; = h/(mv) = (6.626&times;10<sup>&minus;34</sup>) / [(1.673&times;10<sup>&minus;27</sup>)(1.50&times;10<sup>5</sup>)]</li>
+        <li>= (6.626&times;10<sup>&minus;34</sup>) / (2.51&times;10<sup>&minus;22</sup>)</li>
+      </ol>
+      <p class="final">&lambda;<sub>proton</sub> &asymp; 2.64&times;10<sup>&minus;12</sup> m. Since &lambda; = h/(mv) is inversely proportional to mass at a fixed speed, and a proton is about 1836 times more massive than an electron, the proton&rsquo;s de Broglie wavelength at the same speed would be about 1836 times SMALLER than an electron&rsquo;s.</p>`
+    },
+    { type:'challenge',
+      q:'The work function of potassium metal is 2.3 &times; 10<sup>&minus;19</sup> J. Light with wavelength 400. nm strikes the potassium surface. (a) Calculate the energy of one photon of this light. (b) Determine whether this light can eject an electron from potassium. (c) If so, calculate the maximum kinetic energy of the ejected electron using KE = E<sub>photon</sub> &minus; work function. (h = 6.626&times;10<sup>&minus;34</sup> J&middot;s, c = 2.998&times;10<sup>8</sup> m/s)',
+      solution:`<ol>
+        <li>E<sub>photon</sub> = hc/&lambda; = [(6.626&times;10<sup>&minus;34</sup>)(2.998&times;10<sup>8</sup>)] / (400.&times;10<sup>&minus;9</sup>) = 4.97&times;10<sup>&minus;19</sup> J</li>
+        <li>Since 4.97&times;10<sup>&minus;19</sup> J &gt; 2.3&times;10<sup>&minus;19</sup> J (the work function), yes &mdash; this light has enough energy to eject an electron</li>
+        <li>KE<sub>max</sub> = E<sub>photon</sub> &minus; work function = 4.97&times;10<sup>&minus;19</sup> &minus; 2.3&times;10<sup>&minus;19</sup></li>
+      </ol>
+      <p class="final">E<sub>photon</sub> &asymp; 4.97&times;10<sup>&minus;19</sup> J &middot; Yes, an electron is ejected &middot; KE<sub>max</sub> &asymp; 2.67&times;10<sup>&minus;19</sup> J</p>`
+    }
+  ]}
+];
+const state = {}; // key: "topicIndex-qIndex" -> boolean (currently correct)
+const attempts = {}; // key: "topicIndex-qIndex" -> number of wrong guesses so far
+let mcqTotal = 0;
+TOPICS.forEach(t => t.questions.forEach(q => { if(q.type==='mcq') mcqTotal++; }));
+document.getElementById('score-total').textContent = mcqTotal;
+
+function renderNav(){
+  const nav = document.getElementById('topic-nav');
+  nav.innerHTML = TOPICS.map((t,i) =>
+    `<button data-idx="${i}" class="${i===0?'active':''}">${t.prefix} &middot; ${t.label}</button>`
+  ).join('');
+  nav.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      nav.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.topic-section').forEach(s=>s.classList.remove('active'));
+      document.getElementById('section-'+btn.dataset.idx).classList.add('active');
+    });
+  });
+}
+
+function renderMain(){
+  const main = document.getElementById('main');
+  main.innerHTML = TOPICS.map((t,ti) => `
+    <section class="topic-section ${ti===0?'active':''}" id="section-${ti}">
+      <div class="topic-heading">
+        <span class="num mono">UNIT &middot; ${t.prefix}</span>
+        <h2>${t.label}</h2>
+      </div>
+      ${t.questions.map((q,qi)=> renderCard(q,ti,qi,t.prefix)).join('')}
+    </section>
+  `).join('');
+}
+
+function renderCard(q,ti,qi,prefix){
+  const tag = `${prefix}-${String(qi+1).padStart(2,'0')}`;
+  if(q.type==='mcq'){
+    return `
+    <div class="card" id="card-${ti}-${qi}">
+      <span class="tag mono">${tag}</span>
+      <p class="q-text">${q.q}</p>
+      <div class="choices">
+        ${q.choices.map((c,ci)=>`<button class="choice" data-ti="${ti}" data-qi="${qi}" data-ci="${ci}">${c}</button>`).join('')}
+      </div>
+      <div class="feedback" id="fb-${ti}-${qi}"></div>
+    </div>`;
+  } else {
+    return `
+    <div class="card challenge" id="card-${ti}-${qi}">
+      <span class="tag mono">${tag} &middot; challenge</span>
+      <p class="q-text">${q.q}</p>
+      <button class="reveal-btn" data-ti="${ti}" data-qi="${qi}">Reveal step-by-step solution</button>
+      <div class="solution" id="sol-${ti}-${qi}">${q.solution}</div>
+    </div>`;
+  }
+}
+
+function attachHandlers(){
+  document.querySelectorAll('.choice').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const ti = +btn.dataset.ti, qi = +btn.dataset.qi, ci = +btn.dataset.ci;
+      const q = TOPICS[ti].questions[qi];
+      const card = document.getElementById(`card-${ti}-${qi}`);
+      const fb = document.getElementById(`fb-${ti}-${qi}`);
+      const allChoices = card.querySelectorAll('.choice');
+      const key = ti+'-'+qi;
+
+      if(ci === q.correct){
+        allChoices.forEach(c=>c.disabled = true);
+        btn.classList.add('is-correct');
+        card.classList.add('correct'); card.classList.remove('incorrect');
+        fb.innerHTML = `<span class="label">Correct</span>${q.explanation}`;
+        fb.className = 'feedback show good';
+        if(!state[key]){ state[key] = true; updateGauge(); }
+      } else {
+        attempts[key] = (attempts[key] || 0) + 1;
+        btn.classList.add('is-incorrect');
+        btn.disabled = true; // that option is used up either way
+
+        if(attempts[key] < 2){
+          // first miss: no answer reveal, just prompt another try
+          fb.innerHTML = `<span class="label">Not quite</span>Give it one more try &mdash; think back through the setup before picking again.`;
+          fb.className = 'feedback show bad';
+        } else {
+          // second miss: reveal the correct answer and explanation
+          allChoices.forEach(c=>c.disabled = true);
+          allChoices[q.correct].classList.add('is-correct');
+          card.classList.add('incorrect'); card.classList.remove('correct');
+          fb.innerHTML = `<span class="label">Not quite</span>${q.explanation}`;
+          fb.className = 'feedback show bad';
+          state[key] = false;
+          updateGauge();
+        }
+      }
+    });
+  });
+  document.querySelectorAll('.reveal-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const ti = btn.dataset.ti, qi = btn.dataset.qi;
+      const sol = document.getElementById(`sol-${ti}-${qi}`);
+      const showing = sol.classList.toggle('show');
+      btn.textContent = showing ? 'Hide solution' : 'Reveal step-by-step solution';
+    });
+  });
+}
+
+function updateGauge(){
+  const correctCount = Object.values(state).filter(Boolean).length;
+  document.getElementById('score-num').textContent = correctCount;
+  const pct = mcqTotal ? correctCount / mcqTotal : 0;
+  const circumference = 188.5;
+  document.getElementById('gauge-fill').setAttribute('stroke-dashoffset', circumference - (circumference*pct));
+  const angle = -90 + (pct*180);
+  document.getElementById('needle').setAttribute('transform', `rotate(${angle} 75 78)`);
+}
+
+document.getElementById('reset-btn').addEventListener('click', ()=>{
+  Object.keys(state).forEach(k=>delete state[k]);
+  Object.keys(attempts).forEach(k=>delete attempts[k]);
+  renderMain();
+  attachHandlers();
+  updateGauge();
+  document.querySelectorAll('.reveal-btn').forEach(b=>b.textContent='Reveal step-by-step solution');
+});
+
+renderNav();
+renderMain();
+attachHandlers();
+updateGauge();
+</script>
+</body>
+</html>
