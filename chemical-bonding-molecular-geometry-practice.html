@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Foundations Review — Chemical Bonding & Molecular Geometry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #16241f;
+    --bg-alt: #1d2f28;
+    --card: #1b2b25;
+    --ink: #f1ede4;
+    --ink-dim: #a9b6ae;
+    --accent: #e8a93e;
+    --accent-dim: #8a6a2e;
+    --correct: #7fa687;
+    --correct-bg: rgba(127,166,135,0.14);
+    --incorrect: #c1554b;
+    --incorrect-bg: rgba(193,85,75,0.14);
+    --rule: rgba(241,237,228,0.16);
+    --grid: rgba(241,237,228,0.045);
+  }
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    background-color:var(--bg);
+    background-image:
+      repeating-linear-gradient(0deg, var(--grid) 0px, var(--grid) 1px, transparent 1px, transparent 28px),
+      repeating-linear-gradient(90deg, var(--grid) 0px, var(--grid) 1px, transparent 1px, transparent 28px);
+    color:var(--ink);
+    font-family:'Source Serif 4', Georgia, serif;
+    line-height:1.5;
+    min-height:100vh;
+  }
+  .mono{ font-family:'Space Mono', monospace; }
+  a{ color:inherit; }
+
+  /* ---------- Header ---------- */
+  header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:24px;
+    padding:32px clamp(16px,4vw,48px) 20px;
+    border-bottom:1px solid var(--rule);
+    flex-wrap:wrap;
+  }
+  .title-block .eyebrow{
+    font-family:'Space Mono', monospace;
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin:0 0 6px;
+  }
+  .title-block h1{
+    margin:0;
+    font-size:clamp(24px,3.4vw,34px);
+    font-weight:700;
+    letter-spacing:-0.01em;
+  }
+  .title-block p{
+    margin:6px 0 0;
+    color:var(--ink-dim);
+    font-size:15px;
+  }
+
+  /* ---------- Gauge (signature element) ---------- */
+  .gauge-wrap{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:2px;
+    min-width:150px;
+  }
+  .gauge-wrap svg{ width:150px; height:90px; overflow:visible; }
+  .gauge-readout{
+    font-family:'Space Mono', monospace;
+    font-size:13px;
+    color:var(--ink-dim);
+    letter-spacing:.04em;
+  }
+  .gauge-readout strong{ color:var(--ink); }
+  #needle{ transform-origin:75px 78px; transition: transform .5s cubic-bezier(.3,1.4,.4,1); }
+
+  /* ---------- Topic nav ---------- */
+  nav{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    padding:20px clamp(16px,4vw,48px);
+    position:sticky;
+    top:0;
+    background:linear-gradient(var(--bg) 85%, transparent);
+    z-index:10;
+  }
+  nav button{
+    font-family:'Space Mono', monospace;
+    font-size:12px;
+    letter-spacing:.03em;
+    color:var(--ink-dim);
+    background:transparent;
+    border:1px solid var(--rule);
+    border-radius:100px;
+    padding:8px 16px;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  nav button:hover{ border-color:var(--accent-dim); color:var(--ink); }
+  nav button.active{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#1b2b25;
+    font-weight:700;
+  }
+  nav button:focus-visible, button:focus-visible, .choice:focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:2px;
+  }
+
+  main{ padding:8px clamp(16px,4vw,48px) 80px; max-width:820px; margin:0 auto; }
+  .topic-section{ display:none; }
+  .topic-section.active{ display:block; animation:fade .25s ease; }
+  @keyframes fade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+
+  .topic-heading{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    margin:28px 0 18px;
+  }
+  .topic-heading .num{
+    font-family:'Space Mono', monospace;
+    color:var(--accent);
+    font-size:13px;
+  }
+  .topic-heading h2{ margin:0; font-size:20px; font-weight:700; }
+
+  /* ---------- Question cards ---------- */
+  .card{
+    background:var(--card);
+    border:1px solid var(--rule);
+    border-left:3px solid var(--accent-dim);
+    border-radius:4px;
+    padding:22px 24px;
+    margin-bottom:18px;
+    position:relative;
+  }
+  .card.correct{ border-left-color:var(--correct); }
+  .card.incorrect{ border-left-color:var(--incorrect); }
+  .tag{
+    position:absolute;
+    top:-10px;
+    left:20px;
+    background:var(--bg);
+    border:1px solid var(--rule);
+    font-family:'Space Mono', monospace;
+    font-size:11px;
+    letter-spacing:.06em;
+    color:var(--ink-dim);
+    padding:2px 8px;
+    border-radius:3px;
+  }
+  .card.challenge .tag{ color:var(--accent); border-color:var(--accent-dim); }
+  .q-text{ margin:6px 0 16px; font-size:16.5px; }
+  .q-text sub{ font-size:.7em; }
+
+  .choices{ display:flex; flex-direction:column; gap:8px; }
+  .choice{
+    text-align:left;
+    font-family:'Source Serif 4', serif;
+    font-size:15px;
+    background:transparent;
+    border:1px solid var(--rule);
+    border-radius:4px;
+    padding:10px 14px;
+    color:var(--ink);
+    cursor:pointer;
+    transition:all .12s ease;
+  }
+  .choice:hover:not(:disabled){ border-color:var(--accent); background:rgba(232,169,62,0.06); }
+  .choice:disabled{ cursor:default; }
+  .choice.is-correct{ border-color:var(--correct); background:var(--correct-bg); }
+  .choice.is-incorrect{ border-color:var(--incorrect); background:var(--incorrect-bg); }
+
+  .feedback{
+    margin-top:14px;
+    padding:12px 14px;
+    border-radius:4px;
+    font-size:14.5px;
+    display:none;
+  }
+  .feedback.show{ display:block; }
+  .feedback.good{ background:var(--correct-bg); border:1px solid var(--correct); }
+  .feedback.bad{ background:var(--incorrect-bg); border:1px solid var(--incorrect); }
+  .feedback .label{ font-family:'Space Mono', monospace; font-size:11px; letter-spacing:.06em; text-transform:uppercase; display:block; margin-bottom:4px; }
+  .feedback.good .label{ color:var(--correct); }
+  .feedback.bad .label{ color:var(--incorrect); }
+
+  .reveal-btn{
+    font-family:'Space Mono', monospace;
+    font-size:12.5px;
+    letter-spacing:.03em;
+    background:transparent;
+    border:1px solid var(--accent-dim);
+    color:var(--accent);
+    border-radius:4px;
+    padding:9px 16px;
+    cursor:pointer;
+  }
+  .reveal-btn:hover{ background:rgba(232,169,62,0.1); }
+  .solution{
+    display:none;
+    margin-top:16px;
+    padding:16px 18px;
+    background:rgba(232,169,62,0.06);
+    border:1px dashed var(--accent-dim);
+    border-radius:4px;
+    font-size:14.5px;
+  }
+  .solution.show{ display:block; }
+  .solution ol{ margin:6px 0 0; padding-left:20px; }
+  .solution li{ margin-bottom:6px; }
+  .solution .final{ font-family:'Space Mono', monospace; color:var(--accent); }
+
+  footer{
+    text-align:center;
+    padding:24px;
+    color:var(--ink-dim);
+    font-family:'Space Mono', monospace;
+    font-size:12px;
+    border-top:1px solid var(--rule);
+  }
+  footer button{
+    background:none; border:none; color:var(--ink-dim); text-decoration:underline;
+    cursor:pointer; font-family:'Space Mono', monospace; font-size:12px;
+  }
+  footer button:hover{ color:var(--accent); }
+
+  @media (max-width:560px){
+    header{ flex-direction:column; align-items:flex-start; }
+    .gauge-wrap{ align-self:center; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title-block">
+    <p class="eyebrow">AP Chemistry &middot; Test Review</p>
+    <h1>Chemical Bonding &amp; Molecular Geometry</h1>
+    <p>42 problems across 7 topics &mdash; 4 multiple-choice and 2 free-response per topic. Work each one on paper before checking &mdash; the gauge tracks live accuracy on the multiple-choice items.</p>
+  </div>
+  <div class="gauge-wrap">
+    <svg viewBox="0 0 150 90">
+      <path d="M 15 78 A 60 60 0 0 1 135 78" fill="none" stroke="rgba(241,237,228,0.14)" stroke-width="10" stroke-linecap="round"/>
+      <path id="gauge-fill" d="M 15 78 A 60 60 0 0 1 135 78" fill="none" stroke="var(--accent)" stroke-width="10" stroke-linecap="round" stroke-dasharray="188.5" stroke-dashoffset="188.5"/>
+      <g id="needle">
+        <line x1="75" y1="78" x2="75" y2="26" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="75" cy="78" r="5" fill="var(--ink)"/>
+      </g>
+    </svg>
+    <div class="gauge-readout"><strong id="score-num">0</strong> / <span id="score-total">18</span> correct</div>
+  </div>
+</header>
+
+<nav id="topic-nav"></nav>
+<main id="main"></main>
+
+<footer>
+  <button id="reset-btn">reset all progress</button>
+</footer>
+
+<script>
+const TOPICS = [
+  { id:'lewis-bonding', label:'Lewis Symbols, the Octet Rule & Bonding Types', prefix:'L', questions:[
+    { type:'mcq',
+      q:'How many valence electrons (dots) should appear in the Lewis symbol for a sulfur atom (S, Group 16)?',
+      choices:['4','5','6','8'],
+      correct:2,
+      explanation:'For main-group elements, the group number (using the 1&ndash;18 numbering) gives the number of valence electrons directly. Sulfur is in Group 16, so it has 6 valence electrons.'
+    },
+    { type:'mcq',
+      q:'Which statement best describes the octet rule?',
+      choices:['Atoms tend to gain, lose, or share electrons to achieve a total of 8 valence electrons, resembling the electron configuration of a noble gas','All atoms must have exactly 8 protons to be stable','Atoms can never have more than 8 total electrons','Atoms always form exactly 8 bonds to become stable'],
+      correct:0,
+      explanation:'The octet rule describes the tendency of atoms to achieve a stable, noble-gas-like valence shell of 8 electrons through electron transfer (ionic bonding) or electron sharing (covalent bonding).'
+    },
+    { type:'mcq',
+      q:'What type of bonding would be expected between a sodium atom and a chlorine atom?',
+      choices:['Ionic','Covalent','Metallic','Hydrogen bonding'],
+      correct:0,
+      explanation:'Na is a metal with a low ionization energy (it loses its single valence electron easily), and Cl is a nonmetal with a high electron affinity (it readily gains an electron). The electron transfers completely from Na to Cl, forming Na<sup>+</sup> and Cl<sup>&minus;</sup> held together by electrostatic attraction &mdash; an ionic bond.'
+    },
+    { type:'mcq',
+      q:'Which best explains why metals are good conductors of electricity?',
+      choices:['Metal atoms share a &ldquo;sea&rdquo; of delocalized valence electrons that are free to move throughout the metallic lattice, allowing current to flow','Metal atoms form strong covalent bonds that trap electrons tightly between specific pairs of atoms','Metal cations are negatively charged, allowing current to flow easily','Metals have very few valence electrons, which prevents any electron movement'],
+      correct:0,
+      explanation:'In metallic bonding, valence electrons are not localized between specific atoms but are delocalized across the entire lattice of metal cations, forming an electron &ldquo;sea&rdquo; that can flow freely &mdash; this mobility is what makes metals excellent electrical conductors.'
+    },
+    { type:'challenge',
+      q:'For each pair of elements, predict whether the resulting compound is best described as ionic, covalent, or metallic, and justify each answer: (a) Mg and O. (b) C and O. (c) pure copper metal, Cu.',
+      solution:`<p>(a) Mg (a metal with low ionization energy, loses 2 electrons easily) and O (a nonmetal with high electron affinity, gains 2 electrons easily) have a large electronegativity difference, so electrons transfer completely &mdash; forming Mg<sup>2+</sup> and O<sup>2&minus;</sup> held together by <strong>ionic</strong> bonding.</p>
+      <p>(b) C and O are both nonmetals with a smaller electronegativity difference, so they share electrons rather than transferring them completely &mdash; <strong>covalent</strong> bonding (specifically polar covalent, since O is more electronegative than C).</p>
+      <p>(c) Pure copper consists of identical metal atoms sharing a delocalized &ldquo;sea&rdquo; of valence electrons among a lattice of Cu cations &mdash; <strong>metallic</strong> bonding.</p>
+      <p class="final">(a) Ionic &middot; (b) Covalent (polar) &middot; (c) Metallic</p>`
+    },
+    { type:'challenge',
+      q:'Using electron configurations and the octet rule, explain why calcium and fluorine combine in a 1:2 ratio to form CaF<sub>2</sub>, rather than a 1:1 ratio.',
+      solution:`<ol>
+        <li>Ca is [Ar]4s<sup>2</sup> &mdash; it must lose 2 electrons to reach the stable, noble-gas-like [Ar] configuration, forming Ca<sup>2+</sup></li>
+        <li>F is [He]2s<sup>2</sup>2p<sup>5</sup> &mdash; it needs to gain only 1 electron to complete its octet and reach the stable [Ne] configuration, forming F<sup>&minus;</sup></li>
+        <li>Since each Ca<sup>2+</sup> carries a 2+ charge but each F<sup>&minus;</sup> carries only a 1&minus; charge, it takes 2 fluoride ions to balance the charge of one calcium ion</li>
+      </ol>
+      <p class="final">The formula CaF<sub>2</sub> (1 Ca : 2 F) is the ratio that keeps the overall compound electrically neutral while allowing every atom to satisfy the octet rule.</p>`
+    }
+  ]},
+  { id:'polarity', label:'Electronegativity & Bond Polarity', prefix:'B', questions:[
+    { type:'mcq',
+      q:'Which of the following bonds would be expected to have the GREATEST bond polarity (largest electronegativity difference)?',
+      choices:['C&minus;H','N&minus;H','O&minus;H','H&minus;F'],
+      correct:3,
+      explanation:'Approximate electronegativity differences: C(2.5)&minus;H(2.1) = 0.4; N(3.0)&minus;H(2.1) = 0.9; O(3.5)&minus;H(2.1) = 1.4; H(2.1)&minus;F(4.0) = 1.9. H&minus;F has the largest difference and therefore the greatest bond polarity.'
+    },
+    { type:'mcq',
+      q:'Classify the C&minus;Cl bond (electronegativity: C = 2.5, Cl = 3.0).',
+      choices:['Nonpolar covalent','Polar covalent','Ionic','Metallic'],
+      correct:1,
+      explanation:'&Delta;EN = 0.5, which falls in the polar covalent range: the electrons are shared unequally, with chlorine carrying a partial negative charge and carbon a partial positive charge, but the difference isn&rsquo;t large enough for a full electron transfer (ionic bonding).'
+    },
+    { type:'mcq',
+      q:'In the polar covalent bond H&minus;Cl, which atom carries the partial negative charge (&delta;&minus;)?',
+      choices:['H carries &delta;&minus;','Cl carries &delta;&minus;','Both atoms carry equal partial charges','Neither atom carries a partial charge'],
+      correct:1,
+      explanation:'Cl (EN &asymp; 3.0) is more electronegative than H (EN &asymp; 2.1), so it pulls the shared electron density toward itself, becoming &delta;&minus; while H becomes &delta;+.'
+    },
+    { type:'mcq',
+      q:'Which best describes the relationship between ionic and covalent bonding?',
+      choices:['Ionic and covalent bonding represent two ends of a continuous spectrum of electron sharing/transfer, with electronegativity difference determining where a bond falls on that spectrum','Ionic and covalent bonds are entirely separate phenomena with no relationship between them','All bonds between two different elements are ionic, while bonds between identical elements are always covalent, with nothing in between','Covalent bonds only occur between metals, while ionic bonds only occur between nonmetals'],
+      correct:0,
+      explanation:'Rather than being two completely distinct categories, ionic and covalent bonding exist on a continuum. A small electronegativity difference gives nonpolar covalent bonding; a moderate difference gives polar covalent bonding; a very large difference gives bonding so polar it is classified as ionic.'
+    },
+    { type:'challenge',
+      q:'Rank the following bonds in order of INCREASING polarity, and explain your reasoning using electronegativity values: C&minus;H (&Delta;EN &asymp; 0.4), Na&minus;Cl (&Delta;EN &asymp; 2.1), C&minus;O (&Delta;EN &asymp; 1.0), C&minus;F (&Delta;EN &asymp; 1.5).',
+      solution:`<ol>
+        <li>Bond polarity increases as the electronegativity difference between the two bonded atoms increases &mdash; a greater difference means the more electronegative atom pulls shared electron density more strongly toward itself, creating a larger separation of partial charge</li>
+        <li>Order the given &Delta;EN values from smallest to largest: 0.4, 1.0, 1.5, 2.1</li>
+      </ol>
+      <p class="final">Increasing polarity: C&minus;H &lt; C&minus;O &lt; C&minus;F &lt; Na&minus;Cl. Notably, Na&minus;Cl&rsquo;s &Delta;EN is so large that this bond is generally classified as ionic rather than (polar) covalent.</p>`
+    },
+    { type:'challenge',
+      q:'Explain why electronegativity generally INCREASES across a period and DECREASES down a group, using effective nuclear charge and atomic radius. Then identify the most electronegative element on the periodic table and explain why.',
+      solution:`<p>Electronegativity reflects an atom&rsquo;s ability to attract shared electrons in a bond. Across a period, effective nuclear charge increases (atoms get smaller as the nucleus pulls the same-shell electrons in more tightly), so the nucleus can attract shared bonding electrons more strongly, and electronegativity increases. Down a group, atomic radius increases and the valence shell is farther from the nucleus (with more shielding from inner electrons), so the nucleus attracts shared electrons less strongly, and electronegativity decreases.</p>
+      <p class="final">Fluorine is the most electronegative element: among atoms capable of bonding (excluding noble gases), it sits at the top-right of the periodic table, giving it the smallest radius and greatest effective nuclear charge, and therefore the strongest pull on shared electrons.</p>`
+    }
+  ]},
+  { id:'structures', label:'Lewis Structures & Exceptions', prefix:'S', questions:[
+    { type:'mcq',
+      q:'How many total valence electrons must be distributed in the Lewis structure of CO<sub>2</sub>?',
+      choices:['12','16','18','24'],
+      correct:1,
+      explanation:'C contributes 4 valence electrons, and each O contributes 6: 4 + 2(6) = 16 total valence electrons to place as bonds and lone pairs.'
+    },
+    { type:'mcq',
+      q:'Which molecule is best described using resonance structures (its true structure is an average of two or more valid Lewis structures)?',
+      choices:['CH<sub>4</sub>','O<sub>3</sub> (ozone)','NH<sub>3</sub>','HCl'],
+      correct:1,
+      explanation:'Ozone has two equivalent Lewis structures differing only in which O&minus;O bond is drawn as the double bond. Since experiments show both O&minus;O bonds have equal, intermediate length and strength, neither single structure is correct alone &mdash; the real structure is a resonance hybrid of both.'
+    },
+    { type:'mcq',
+      q:'Which molecule is an example of an &ldquo;expanded octet&rdquo; (central atom surrounded by more than 8 valence electrons in a valid Lewis structure)?',
+      choices:['CO<sub>2</sub>','SF<sub>6</sub>','NH<sub>3</sub>','BF<sub>3</sub>'],
+      correct:1,
+      explanation:'Sulfur in SF<sub>6</sub> is surrounded by 6 bonding pairs (12 electrons), an expanded octet possible because S is in period 3 or higher with orbitals energetically accessible enough to accommodate more than 8 electrons. (BF<sub>3</sub>, by contrast, is a different type of exception &mdash; an incomplete octet, with only 6 electrons around B.)'
+    },
+    { type:'mcq',
+      q:'Which molecule is an &ldquo;odd-electron&rdquo; species that cannot satisfy the octet rule for every atom because it has an odd total number of valence electrons?',
+      choices:['CO<sub>2</sub>','NO','H<sub>2</sub>O','NH<sub>3</sub>'],
+      correct:1,
+      explanation:'NO has 5 + 6 = 11 total valence electrons &mdash; an odd number. Since electrons must be paired into bonds or lone pairs, an odd total means one electron is left unpaired somewhere in the molecule (a free radical), making it impossible for every atom to simultaneously satisfy the octet rule.'
+    },
+    { type:'challenge',
+      q:'Draw the Lewis structure(s) for the nitrate ion, NO<sub>3</sub><sup>&minus;</sup>, including all resonance structures. (a) How many total valence electrons must be used? (b) How many equivalent resonance structures can be drawn? (c) What does this tell you about the actual N&minus;O bond lengths within the ion?',
+      solution:`<ol>
+        <li>Valence electrons: N(5) + 3&times;O(6) + 1 (for the &minus;1 charge) = 5 + 18 + 1 = 24</li>
+        <li>Single bonds alone to all 3 O atoms would leave N with only 6 electrons around it (incomplete octet), so one N=O double bond is required, with the other two N&minus;O bonds single. Since any of the 3 oxygens could be the one double-bonded to N, there are 3 equivalent resonance structures</li>
+        <li>The true structure is an average (hybrid) of all 3 resonance structures</li>
+      </ol>
+      <p class="final">24 valence electrons &middot; 3 equivalent resonance structures &middot; All three N&minus;O bonds are experimentally identical in length &mdash; intermediate between a single and double bond &mdash; rather than two single bonds and one shorter double bond as any one resonance structure alone would suggest.</p>`
+    },
+    { type:'challenge',
+      q:'(a) Explain how XeF<sub>4</sub> can have an expanded octet around Xe, even though xenon is a noble gas. (b) ClO<sub>2</sub> cannot satisfy the octet rule for all its atoms &mdash; explain why, based on its total valence electron count.',
+      solution:`<p>(a) In XeF<sub>4</sub>, Xe forms 4 bonds to F atoms and retains 2 lone pairs, for a total of 12 electrons around the central Xe atom &mdash; an expanded octet. This is possible because Xe (period 5) is a large, heavy noble gas with orbitals energetically accessible enough to participate in bonding when paired with a highly electronegative element like F, unlike smaller noble gases such as He or Ne.</p>
+      <p>(b) ClO<sub>2</sub> has 7(Cl) + 2(6)(O) = 19 total valence electrons &mdash; an odd number. Because electrons must pair into bonds or lone pairs, an odd total electron count makes it impossible to pair every electron, leaving one electron unpaired somewhere in the molecule. This makes ClO<sub>2</sub> an odd-electron (free radical) species that cannot have every atom simultaneously satisfy the octet rule.</p>
+      <p class="final">(a) Xe&rsquo;s large size and accessible orbitals allow an expanded octet. (b) ClO<sub>2</sub>&rsquo;s odd (19) valence electron count guarantees one unpaired electron.</p>`
+    }
+  ]},
+  { id:'bondorder', label:'Bond Order, Strength & Length', prefix:'O', questions:[
+    { type:'mcq',
+      q:'Which correctly ranks these carbon&minus;carbon bonds in order of INCREASING bond length: C&equiv;C, C&minus;C, C=C?',
+      choices:['C&minus;C &lt; C=C &lt; C&equiv;C','C&equiv;C &lt; C=C &lt; C&minus;C','C=C &lt; C&minus;C &lt; C&equiv;C','C&minus;C &lt; C&equiv;C &lt; C=C'],
+      correct:1,
+      explanation:'More shared electron pairs pull the bonded atoms closer together, so bond length decreases as bond order increases: triple &lt; double &lt; single. The increasing-length order is therefore C&equiv;C &lt; C=C &lt; C&minus;C.'
+    },
+    { type:'mcq',
+      q:'Which correctly ranks these same carbon&minus;carbon bonds in order of INCREASING bond strength (bond energy)?',
+      choices:['C&minus;C &lt; C=C &lt; C&equiv;C','C&equiv;C &lt; C=C &lt; C&minus;C','C=C &lt; C&equiv;C &lt; C&minus;C','C&minus;C &lt; C&equiv;C &lt; C=C'],
+      correct:0,
+      explanation:'More shared electron pairs means a stronger attraction holding the atoms together, requiring more energy to break &mdash; so bond strength increases with bond order: single &lt; double &lt; triple.'
+    },
+    { type:'mcq',
+      q:'In the carbonate ion, CO<sub>3</sub><sup>2&minus;</sup>, resonance distributes one double bond&rsquo;s worth of character across all three equivalent C&minus;O bonds. What is the approximate bond order of each C&minus;O bond?',
+      choices:['1.00','1.33','1.50','2.00'],
+      correct:1,
+      explanation:'Each resonance structure has one C=O (bond order 2) and two C&minus;O (bond order 1 each). Averaging across all 3 equivalent resonance structures and 3 total bonds: (2+1+1)/3 = 1.33, intermediate between a single and double bond.'
+    },
+    { type:'mcq',
+      q:'As bond order increases (e.g., from single to double to triple), what happens to bond length and bond strength?',
+      choices:['Bond length increases and bond strength decreases','Bond length decreases and bond strength increases','Both bond length and bond strength increase','Both bond length and bond strength decrease'],
+      correct:1,
+      explanation:'A higher bond order means more shared electron pairs pulling the two nuclei together, resulting in a shorter AND stronger bond.'
+    },
+    { type:'challenge',
+      q:'Given approximate bond lengths C&equiv;O (in CO) &asymp; 113 pm, C=O (in CO<sub>2</sub>) &asymp; 116 pm, and C&minus;O (in CO<sub>3</sub><sup>2&minus;</sup>) &asymp; 129 pm, explain this trend in terms of bond order.',
+      solution:`<p>CO has a triple bond (bond order 3), the highest of the three, consistent with it having the shortest length (113 pm).</p>
+      <p>CO<sub>2</sub> has C=O double bonds (bond order 2), a lower bond order than CO&rsquo;s triple bond, consistent with its slightly longer length (116 pm).</p>
+      <p>CO<sub>3</sub><sup>2&minus;</sup> has an averaged bond order of 1.33 (one double and two single bonds spread across 3 equivalent resonance structures) &mdash; the lowest bond order of the three, consistent with it having the longest C&minus;O bond (129 pm).</p>
+      <p class="final">As bond order decreases (3 &rarr; 2 &rarr; 1.33), bond length increases (113 &rarr; 116 &rarr; 129 pm), confirming the inverse relationship between bond order and bond length.</p>`
+    },
+    { type:'challenge',
+      q:'Using average bond energies (kJ/mol): C&minus;C = 347, C=C = 614, C&equiv;C = 839, explain why the bond energy does NOT simply triple going from a single to a triple bond, even though three electron pairs are shared instead of one.',
+      solution:`<p>A triple bond consists of one strong &sigma; (sigma) bond, formed from direct, head-on orbital overlap along the internuclear axis, plus two weaker &pi; (pi) bonds, formed from the less effective sideways overlap of parallel p-orbitals above and below the bond axis.</p>
+      <p>Because each additional &pi; bond contributes less strength than the original &sigma; bond, going from 1 to 3 shared pairs does not triple the bond energy: 3 &times; 347 = 1041 kJ/mol, but the actual C&equiv;C bond energy is only 839 kJ/mol &mdash; noticeably less than this naive prediction.</p>
+      <p class="final">Bond energy increases with bond order, but not in direct proportion, because &pi; bonds (formed by weaker sideways orbital overlap) add less strength than the initial &sigma; bond.</p>`
+    }
+  ]},
+  { id:'vsepr', label:'VSEPR Theory & Molecular Shape', prefix:'V', questions:[
+    { type:'mcq',
+      q:'According to VSEPR theory, what is the molecular geometry of a central atom with 4 bonding domains and 0 lone pairs (e.g., CH<sub>4</sub>)?',
+      choices:['Trigonal planar','Tetrahedral','Trigonal bipyramidal','Octahedral'],
+      correct:1,
+      explanation:'4 electron domains, all bonding pairs, arrange themselves as far apart as possible in three dimensions, giving a tetrahedral molecular geometry with 109.5&deg; bond angles.'
+    },
+    { type:'mcq',
+      q:'What is the molecular geometry of NH<sub>3</sub> (3 bonding pairs + 1 lone pair on the central N atom)?',
+      choices:['Tetrahedral','Trigonal pyramidal','Trigonal planar','Bent'],
+      correct:1,
+      explanation:'The electron-domain geometry around N is tetrahedral (4 total domains: 3 bonding + 1 lone pair), but molecular geometry describes only the positions of the atoms. Removing the lone pair&rsquo;s position from the description leaves a trigonal pyramidal shape, with a bond angle slightly less than 109.5&deg; due to extra lone-pair repulsion.'
+    },
+    { type:'mcq',
+      q:'What is the molecular geometry of H<sub>2</sub>O (2 bonding pairs + 2 lone pairs on the central O atom)?',
+      choices:['Linear','Bent','Trigonal planar','Tetrahedral'],
+      correct:1,
+      explanation:'The electron-domain geometry is tetrahedral (4 total domains), but with 2 lone pairs the molecular shape (atom positions only) is bent, with a bond angle of about 104.5&deg; &mdash; even smaller than NH<sub>3</sub>&rsquo;s due to greater repulsion from 2 lone pairs instead of 1.'
+    },
+    { type:'mcq',
+      q:'Which correctly ranks these species in order of DECREASING bond angle: CH<sub>4</sub> (109.5&deg;), NH<sub>3</sub>, H<sub>2</sub>O?',
+      choices:['CH<sub>4</sub> &gt; NH<sub>3</sub> &gt; H<sub>2</sub>O','H<sub>2</sub>O &gt; NH<sub>3</sub> &gt; CH<sub>4</sub>','NH<sub>3</sub> &gt; CH<sub>4</sub> &gt; H<sub>2</sub>O','H<sub>2</sub>O &gt; CH<sub>4</sub> &gt; NH<sub>3</sub>'],
+      correct:0,
+      explanation:'As lone pairs increase (0 &rarr; 1 &rarr; 2) while the underlying electron-domain geometry stays tetrahedral, lone pair&ndash;bonding pair repulsion compresses the bond angle more with each additional lone pair: CH<sub>4</sub> (109.5&deg;) &gt; NH<sub>3</sub> (&asymp;107&deg;) &gt; H<sub>2</sub>O (&asymp;104.5&deg;).'
+    },
+    { type:'challenge',
+      q:'For the molecule SF<sub>4</sub>: (a) Determine the number of bonding domains and lone pairs on the central S atom. (b) Identify the electron-domain geometry. (c) Identify the molecular geometry, and explain why it differs from the electron-domain geometry.',
+      solution:`<ol>
+        <li>S has 6 valence electrons; it forms 4 bonds to F (using 4 electrons) and retains 1 lone pair (2 electrons) &mdash; 4 bonding domains + 1 lone pair = 5 total electron domains</li>
+        <li>Electron-domain geometry: trigonal bipyramidal (5 domains arrange this way to minimize repulsion)</li>
+        <li>Molecular geometry: removing the lone pair&rsquo;s position (it occupies an equatorial spot to minimize repulsion) from the trigonal bipyramidal arrangement leaves the 4 F atoms in a &ldquo;seesaw&rdquo; shape</li>
+      </ol>
+      <p class="final">4 bonding domains + 1 lone pair &middot; Electron-domain geometry: trigonal bipyramidal &middot; Molecular geometry: seesaw</p>`
+    },
+    { type:'challenge',
+      q:'Compare the molecular geometries of CO<sub>2</sub> and SO<sub>2</sub>, even though both have a central atom attached to 2 oxygen atoms. Explain why these molecules have different shapes, referencing lone pairs on the central atom.',
+      solution:`<p>In CO<sub>2</sub>, carbon has 4 valence electrons and forms 2 double bonds to O, using all 4 electrons and leaving 0 lone pairs on C. With 2 bonding domains and 0 lone pairs, both the electron-domain geometry and molecular geometry are linear (180&deg; bond angle).</p>
+      <p>In SO<sub>2</sub>, sulfur has 6 valence electrons; bonding to the 2 oxygens (accounting for resonance) uses 4 of them, leaving 1 lone pair on S. With 2 bonding domains + 1 lone pair = 3 total electron domains, the electron-domain geometry is trigonal planar, but with a lone pair present the molecular geometry is bent (similar reasoning to ozone), with a bond angle close to but slightly less than 120&deg;.</p>
+      <p class="final">CO<sub>2</sub> is linear because carbon has no lone pairs; SO<sub>2</sub> is bent because sulfur retains one lone pair &mdash; shape depends on TOTAL electron domains (bonding + lone pairs), not just the number of attached atoms.</p>`
+    }
+  ]},
+  { id:'hybrid', label:'Molecular Polarity & Hybrid Orbitals', prefix:'H', questions:[
+    { type:'mcq',
+      q:'Which of the following molecules is nonpolar overall, despite containing polar bonds?',
+      choices:['H<sub>2</sub>O','NH<sub>3</sub>','CO<sub>2</sub>','HCl'],
+      correct:2,
+      explanation:'CO<sub>2</sub> has two polar C=O bonds, but because the molecule is linear and symmetric, the two bond dipoles point in exactly opposite directions and cancel out &mdash; giving a net dipole moment of zero despite the polar bonds.'
+    },
+    { type:'mcq',
+      q:'Why is H<sub>2</sub>O polar overall, while CO<sub>2</sub> (also containing polar bonds) is nonpolar overall?',
+      choices:['H<sub>2</sub>O&rsquo;s bent shape means its two bond dipoles do not point in opposite directions and don&rsquo;t cancel, while CO<sub>2</sub>&rsquo;s linear, symmetric shape causes its bond dipoles to cancel exactly','Oxygen is more electronegative than carbon, which automatically makes any oxygen-containing molecule polar','H<sub>2</sub>O has more total electrons than CO<sub>2</sub>, making it more polar','CO<sub>2</sub> contains double bonds, and double bonds are never polar'],
+      correct:0,
+      explanation:'Molecular polarity depends on both bond polarity AND molecular shape. H<sub>2</sub>O&rsquo;s bent shape leaves its two O&minus;H bond dipoles only partially opposing each other, so they add up to a net dipole; CO<sub>2</sub>&rsquo;s linear shape places its two bond dipoles exactly opposite each other, so they cancel completely.'
+    },
+    { type:'mcq',
+      q:'What is the hybridization of the central carbon atom in CH<sub>4</sub> (4 bonding domains, 0 lone pairs)?',
+      choices:['sp','sp<sup>2</sup>','sp<sup>3</sup>','sp<sup>3</sup>d'],
+      correct:2,
+      explanation:'4 total electron domains require 4 hybrid orbitals to accommodate them, corresponding to sp<sup>3</sup> hybridization (mixing one s orbital and three p orbitals).'
+    },
+    { type:'mcq',
+      q:'What is the hybridization of the central carbon atom in CH<sub>2</sub>O (formaldehyde: one C=O double bond and two C&minus;H single bonds &mdash; 3 total electron domains around C)?',
+      choices:['sp','sp<sup>2</sup>','sp<sup>3</sup>','sp<sup>3</sup>d'],
+      correct:1,
+      explanation:'A double bond counts as ONE electron domain for hybridization purposes. With 3 total electron domains (the C=O domain plus 2 C&minus;H domains), carbon needs 3 hybrid orbitals &mdash; sp<sup>2</sup> hybridization, consistent with its trigonal planar shape.'
+    },
+    { type:'challenge',
+      q:'For the molecule SF<sub>6</sub>: (a) Determine the molecular shape using VSEPR theory. (b) Determine the hybridization of the central S atom. (c) Predict whether SF<sub>6</sub> is polar or nonpolar overall, and justify your answer based on molecular symmetry.',
+      solution:`<ol>
+        <li>S forms 6 bonds to F, using all 6 valence electrons and leaving 0 lone pairs &mdash; 6 bonding domains, 0 lone pairs &mdash; octahedral molecular geometry</li>
+        <li>6 total electron domains require 6 hybrid orbitals &mdash; sp<sup>3</sup>d<sup>2</sup> hybridization</li>
+        <li>Even though each individual S&minus;F bond is polar (F is more electronegative than S), the 6 identical bonds are arranged symmetrically around S in an octahedral shape, so the bond dipoles point in such a way that they cancel out exactly</li>
+      </ol>
+      <p class="final">Shape: octahedral &middot; Hybridization: sp<sup>3</sup>d<sup>2</sup> &middot; Polarity: nonpolar overall, due to symmetric cancellation of the individual bond dipoles</p>`
+    },
+    { type:'challenge',
+      q:'For the molecule PCl<sub>3</sub>: (a) Determine the number of bonding domains and lone pairs on the central P atom. (b) Determine the molecular shape and the hybridization of the central P atom. (c) Predict whether PCl<sub>3</sub> is polar or nonpolar overall, and explain your reasoning.',
+      solution:`<ol>
+        <li>P has 5 valence electrons; it forms 3 bonds to Cl (using 3 electrons) and retains 1 lone pair (2 electrons) &mdash; 4 total electron domains (3 bonding + 1 lone pair)</li>
+        <li>Electron-domain geometry: tetrahedral; molecular geometry: trigonal pyramidal (same reasoning as NH<sub>3</sub>). 4 total electron domains &mdash; sp<sup>3</sup> hybridization</li>
+        <li>The trigonal pyramidal shape is NOT symmetric: the lone pair occupies one position of the tetrahedral arrangement with no bond on the opposite side to balance it</li>
+      </ol>
+      <p class="final">4 bonding domains + 1 lone pair &middot; Shape: trigonal pyramidal &middot; Hybridization: sp<sup>3</sup> &middot; Polarity: polar overall &mdash; the asymmetric shape means the three P&minus;Cl bond dipoles (and the lone pair&rsquo;s electron density) do not cancel, producing a net molecular dipole.</p>`
+    }
+  ]},
+  { id:'pes', label:'Photoelectron Spectroscopy (PES)', prefix:'P', questions:[
+    { type:'mcq',
+      q:'A photon with energy 11.5 MJ/mol strikes an atom, ejecting an electron with a measured kinetic energy of 7.2 MJ/mol. What is the binding energy of that electron? (BE = E<sub>photon</sub> &minus; KE)',
+      choices:['4.3 MJ/mol','18.7 MJ/mol','0.62 MJ/mol','11.5 MJ/mol'],
+      correct:0,
+      explanation:'BE = E<sub>photon</sub> &minus; KE = 11.5 &minus; 7.2 = 4.3 MJ/mol, by conservation of energy: the photon&rsquo;s energy splits between removing the electron (binding energy) and the leftover kinetic energy it carries away.'
+    },
+    { type:'mcq',
+      q:'A PES spectrum (read from highest to lowest binding energy) shows four peaks with relative heights 2:2:6:1. Which element does this spectrum most likely represent?',
+      choices:['Fluorine (2:2:5)','Neon (2:2:6)','Sodium (2:2:6:1)','Magnesium (2:2:6:2)'],
+      correct:2,
+      explanation:'The pattern 2:2:6:1 corresponds to 1s<sup>2</sup>2s<sup>2</sup>2p<sup>6</sup>3s<sup>1</sup>, sodium&rsquo;s electron configuration (11 total electrons). Peak height reflects the number of electrons in each subshell.'
+    },
+    { type:'mcq',
+      q:`Compare the simplified PES diagrams below, which show only the 1s peak for lithium and sodium (both have 2 electrons in 1s, so the peak heights are equal &mdash; only the horizontal position differs).<br><br><svg viewBox="0 0 440 170" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:400px;height:auto;display:block;margin:14px auto;">
+        <text x="8" y="16" font-family="Space Mono, monospace" font-size="12" fill="var(--ink)">Lithium (Li) &mdash; 1s peak</text>
+        <line x1="8" y1="48" x2="432" y2="48" stroke="var(--rule)" stroke-width="1.5"/>
+        <line x1="330" y1="48" x2="330" y2="16" stroke="var(--accent)" stroke-width="5" stroke-linecap="round"/>
+        <text x="8" y="90" font-family="Space Mono, monospace" font-size="12" fill="var(--ink)">Sodium (Na) &mdash; 1s peak</text>
+        <line x1="8" y1="122" x2="432" y2="122" stroke="var(--rule)" stroke-width="1.5"/>
+        <line x1="90" y1="122" x2="90" y2="90" stroke="var(--accent)" stroke-width="5" stroke-linecap="round"/>
+        <line x1="8" y1="140" x2="432" y2="140" stroke="var(--ink-dim)" stroke-width="1"/>
+        <text x="8" y="158" font-family="Space Mono, monospace" font-size="10" fill="var(--ink-dim)">&#8592; higher binding energy</text>
+        <text x="288" y="158" font-family="Space Mono, monospace" font-size="10" fill="var(--ink-dim)">lower binding energy &#8594;</text>
+      </svg><br>Both elements have exactly 2 electrons in the 1s subshell, yet sodium&rsquo;s 1s peak appears at a MUCH higher binding energy than lithium&rsquo;s. What best explains this shift?`,
+      choices:['Sodium has more protons than lithium, and since 1s electrons experience almost no shielding from other electrons, the greater nuclear charge pulls sodium&rsquo;s 1s electrons in more tightly','Sodium&rsquo;s 1s electrons are shielded much more effectively by its additional outer-shell electrons, lowering their binding energy less than expected','Lithium&rsquo;s 1s orbital is physically larger than sodium&rsquo;s, which increases lithium&rsquo;s binding energy','The number of protons has no effect on 1s binding energy; only the total electron count matters'],
+      correct:0,
+      explanation:'Even though both atoms have exactly 2 electrons in 1s, sodium has far more protons (11) than lithium (3). The 1s electrons sit essentially unshielded by any other electrons (nothing sits closer to the nucleus to block the attraction), so sodium&rsquo;s much larger nuclear charge pulls its 1s electrons in far more tightly &mdash; shifting its 1s peak to a dramatically higher binding energy, even though the two elements share a group and an identical 1s electron count.'
+    },
+    { type:'mcq',
+      q:'Core electron (e.g., 1s) binding energies generally _____ moving DOWN a group, even though valence binding energy decreases down the same group. Why?',
+      choices:['Increase; even though 1s electrons gain no additional shielding moving down a group, the increased nuclear charge still pulls on them more strongly','Decrease, for the same reason valence binding energy decreases','Stay exactly the same regardless of nuclear charge','Become impossible to measure using PES'],
+      correct:0,
+      explanation:'Unlike valence electrons, which gain substantial extra shielding from each new inner shell added down a group, the innermost 1s electrons always have essentially zero electrons shielding them from the nucleus. So each added proton down a group still increases the effective nuclear charge &mdash; and thus the binding energy &mdash; felt specifically by the 1s electrons.'
+    },
+    { type:'challenge',
+      q:'The complete PES spectrum of an unknown element shows 6 distinct peaks (highest to lowest binding energy) with relative heights: 2, 2, 6, 2, 6, 1. (a) Determine the total number of electrons and identify the element. (b) Write its complete ground-state electron configuration. (c) Predict this element&rsquo;s group number and state its number of valence electrons.',
+      solution:`<ol>
+        <li>Total electrons = 2+2+6+2+6+1 = 19 &rarr; Z = 19, Potassium (K)</li>
+        <li>Electron configuration: 1s<sup>2</sup>2s<sup>2</sup>2p<sup>6</sup>3s<sup>2</sup>3p<sup>6</sup>4s<sup>1</sup></li>
+      </ol>
+      <p class="final">Potassium, 1s<sup>2</sup>2s<sup>2</sup>2p<sup>6</sup>3s<sup>2</sup>3p<sup>6</sup>4s<sup>1</sup> &middot; Group 1 (alkali metals) &middot; 1 valence electron (4s<sup>1</sup>)</p>`
+    },
+    { type:'challenge',
+      q:'Consider the isoelectronic series O<sup>2&minus;</sup>, F<sup>&minus;</sup>, Ne, Na<sup>+</sup>, Mg<sup>2+</sup> (all 1s<sup>2</sup>2s<sup>2</sup>2p<sup>6</sup>). (a) Would all five species show the same relative peak height PATTERN in their PES spectra? Explain. (b) Rank these five species in order of INCREASING binding energy for their outermost (2p) electrons, and justify your ranking.',
+      solution:`<p>(a) Yes &mdash; since all five species share the identical 1s<sup>2</sup>2s<sup>2</sup>2p<sup>6</sup> configuration, their spectra would all show exactly 3 peaks in the same 2:2:6 relative height ratio.</p>
+      <p>(b) The only difference between these isoelectronic species is nuclear charge: O(8) &lt; F(9) &lt; Ne(10) &lt; Na(11) &lt; Mg(12). More protons pulling on the same 10 electrons means higher binding energy.</p>
+      <p class="final">Increasing 2p binding energy: O<sup>2&minus;</sup> &lt; F<sup>&minus;</sup> &lt; Ne &lt; Na<sup>+</sup> &lt; Mg<sup>2+</sup>, following directly from increasing proton count across the isoelectronic series.</p>`
+    }
+  ]}
+];
+const state = {}; // key: "topicIndex-qIndex" -> boolean (currently correct)
+const attempts = {}; // key: "topicIndex-qIndex" -> number of wrong guesses so far
+let mcqTotal = 0;
+TOPICS.forEach(t => t.questions.forEach(q => { if(q.type==='mcq') mcqTotal++; }));
+document.getElementById('score-total').textContent = mcqTotal;
+
+function renderNav(){
+  const nav = document.getElementById('topic-nav');
+  nav.innerHTML = TOPICS.map((t,i) =>
+    `<button data-idx="${i}" class="${i===0?'active':''}">${t.prefix} &middot; ${t.label}</button>`
+  ).join('');
+  nav.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      nav.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.topic-section').forEach(s=>s.classList.remove('active'));
+      document.getElementById('section-'+btn.dataset.idx).classList.add('active');
+    });
+  });
+}
+
+function renderMain(){
+  const main = document.getElementById('main');
+  main.innerHTML = TOPICS.map((t,ti) => `
+    <section class="topic-section ${ti===0?'active':''}" id="section-${ti}">
+      <div class="topic-heading">
+        <span class="num mono">UNIT &middot; ${t.prefix}</span>
+        <h2>${t.label}</h2>
+      </div>
+      ${t.questions.map((q,qi)=> renderCard(q,ti,qi,t.prefix)).join('')}
+    </section>
+  `).join('');
+}
+
+function renderCard(q,ti,qi,prefix){
+  const tag = `${prefix}-${String(qi+1).padStart(2,'0')}`;
+  if(q.type==='mcq'){
+    return `
+    <div class="card" id="card-${ti}-${qi}">
+      <span class="tag mono">${tag}</span>
+      <p class="q-text">${q.q}</p>
+      <div class="choices">
+        ${q.choices.map((c,ci)=>`<button class="choice" data-ti="${ti}" data-qi="${qi}" data-ci="${ci}">${c}</button>`).join('')}
+      </div>
+      <div class="feedback" id="fb-${ti}-${qi}"></div>
+    </div>`;
+  } else {
+    return `
+    <div class="card challenge" id="card-${ti}-${qi}">
+      <span class="tag mono">${tag} &middot; challenge</span>
+      <p class="q-text">${q.q}</p>
+      <button class="reveal-btn" data-ti="${ti}" data-qi="${qi}">Reveal step-by-step solution</button>
+      <div class="solution" id="sol-${ti}-${qi}">${q.solution}</div>
+    </div>`;
+  }
+}
+
+function attachHandlers(){
+  document.querySelectorAll('.choice').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const ti = +btn.dataset.ti, qi = +btn.dataset.qi, ci = +btn.dataset.ci;
+      const q = TOPICS[ti].questions[qi];
+      const card = document.getElementById(`card-${ti}-${qi}`);
+      const fb = document.getElementById(`fb-${ti}-${qi}`);
+      const allChoices = card.querySelectorAll('.choice');
+      const key = ti+'-'+qi;
+
+      if(ci === q.correct){
+        allChoices.forEach(c=>c.disabled = true);
+        btn.classList.add('is-correct');
+        card.classList.add('correct'); card.classList.remove('incorrect');
+        fb.innerHTML = `<span class="label">Correct</span>${q.explanation}`;
+        fb.className = 'feedback show good';
+        if(!state[key]){ state[key] = true; updateGauge(); }
+      } else {
+        attempts[key] = (attempts[key] || 0) + 1;
+        btn.classList.add('is-incorrect');
+        btn.disabled = true; // that option is used up either way
+
+        if(attempts[key] < 2){
+          // first miss: no answer reveal, just prompt another try
+          fb.innerHTML = `<span class="label">Not quite</span>Give it one more try &mdash; think back through the setup before picking again.`;
+          fb.className = 'feedback show bad';
+        } else {
+          // second miss: reveal the correct answer and explanation
+          allChoices.forEach(c=>c.disabled = true);
+          allChoices[q.correct].classList.add('is-correct');
+          card.classList.add('incorrect'); card.classList.remove('correct');
+          fb.innerHTML = `<span class="label">Not quite</span>${q.explanation}`;
+          fb.className = 'feedback show bad';
+          state[key] = false;
+          updateGauge();
+        }
+      }
+    });
+  });
+  document.querySelectorAll('.reveal-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const ti = btn.dataset.ti, qi = btn.dataset.qi;
+      const sol = document.getElementById(`sol-${ti}-${qi}`);
+      const showing = sol.classList.toggle('show');
+      btn.textContent = showing ? 'Hide solution' : 'Reveal step-by-step solution';
+    });
+  });
+}
+
+function updateGauge(){
+  const correctCount = Object.values(state).filter(Boolean).length;
+  document.getElementById('score-num').textContent = correctCount;
+  const pct = mcqTotal ? correctCount / mcqTotal : 0;
+  const circumference = 188.5;
+  document.getElementById('gauge-fill').setAttribute('stroke-dashoffset', circumference - (circumference*pct));
+  const angle = -90 + (pct*180);
+  document.getElementById('needle').setAttribute('transform', `rotate(${angle} 75 78)`);
+}
+
+document.getElementById('reset-btn').addEventListener('click', ()=>{
+  Object.keys(state).forEach(k=>delete state[k]);
+  Object.keys(attempts).forEach(k=>delete attempts[k]);
+  renderMain();
+  attachHandlers();
+  updateGauge();
+  document.querySelectorAll('.reveal-btn').forEach(b=>b.textContent='Reveal step-by-step solution');
+});
+
+renderNav();
+renderMain();
+attachHandlers();
+updateGauge();
+</script>
+</body>
+</html>
